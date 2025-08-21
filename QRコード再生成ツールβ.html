@@ -4,39 +4,30 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>QRコード読み取り＆再生成ツール</title>
-  <script src="https://cdn.jsdelivr.net/npm/jsqr/dist/jsQR.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
   <style>
     body {
       background: #1e1e1e;
+      font-family: "Segoe UI", sans-serif;
       color: #f0f0f0;
-      font-family: sans-serif;
       margin: 0;
-      padding: 20px;
-      display: flex;
-      justify-content: center;
-      align-items: flex-start;
-      min-height: 100vh;
+      padding: 0;
     }
-
     .container {
-      background: #2c2c2c;
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.4);
-      width: 90%;          /* スマホは90% */
-      max-width: 420px;    /* PCは従来サイズ */
+      max-width: 420px;
       margin: 20px auto;
-      box-sizing: border-box;
+      padding: 20px;
+      background: #2c2c2c;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.4);
     }
-
     h2 {
-      margin-bottom: 16px;
-      color: #c084fc;
+      margin-top: 0;
       font-size: 1.2rem;
+      color: #a855f7;
       text-align: center;
     }
-
     select, input {
       width: 100%;
       padding: 10px;
@@ -44,79 +35,49 @@
       border: 1px solid #444;
       border-radius: 6px;
       font-size: 1rem;
+      background: #3a3a3a;
+      color: #f0f0f0;
       box-sizing: border-box;
-      background: #3a3a3a;   /* ダーク背景 */
-      color: #f0f0f0;        /* 白文字 */
     }
-
     select:focus, input:focus {
+      border: 1px solid #a855f7;
       outline: none;
-      border: 1px solid #a855f7; /* 紫でアクセント */
     }
-
-    button {
-      background: #a855f7;
-      color: white;
-      border: none;
-      padding: 12px;
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 1rem;
-      width: 100%;
-      margin-bottom: 10px;
-    }
-
-    button:hover {
-      background: #9333ea;
-    }
-
-    #uploadZone {
+    .drop-zone {
       border: 2px dashed #666;
-      border-radius: 8px;
+      border-radius: 6px;
       padding: 20px;
       text-align: center;
       margin-bottom: 12px;
-      cursor: pointer;
-      position: relative;
-      overflow: hidden;
-    }
-
-    #uploadZone input[type="file"] {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      opacity: 0;
+      color: #bbb;
       cursor: pointer;
     }
-
-    #preview {
-      margin-top: 10px;
-      text-align: center;
-    }
-
-    #preview img {
-      max-width: 100%;
-      border-radius: 8px;
-    }
-
-    #qrResult {
-      margin: 10px 0;
-      padding: 10px;
+    .drop-zone.dragover {
+      border-color: #a855f7;
       background: #3a3a3a;
-      border-radius: 6px;
-      font-size: 0.9rem;
-      min-height: 24px;
-      color: #ccc;
     }
-
-    #qrCanvas {
-      display: block;
+    button {
+      width: 100%;
+      padding: 12px;
+      margin: 6px 0;
+      background: #a855f7;
+      color: white;
+      font-size: 1rem;
+      font-weight: bold;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    button:hover {
+      background: #9333ea;
+    }
+    #qrcode {
+      display: none; /* 初期は非表示 */
       margin: 10px auto;
-      background: white;
-      padding: 10px;
       border-radius: 8px;
+      max-width: 100%;
+      background: transparent;
     }
   </style>
 </head>
@@ -125,136 +86,119 @@
     <h2>QRコード読み取り＆再生成ツール</h2>
 
     <label>入力モード</label>
-    <select id="inputMode" onchange="toggleInputMode()">
+    <select id="inputMode">
       <option value="upload">アップロード</option>
       <option value="camera">カメラ</option>
     </select>
 
-    <!-- アップロードモード -->
-    <div id="uploadZone">
-      ここに画像をドラッグ＆ドロップ<br>またはクリックで選択
-      <input type="file" id="qrFile" accept="image/*">
+    <!-- アップロード用 -->
+    <div id="uploadSection">
+      <div id="dropZone" class="drop-zone">
+        ここに画像をドラッグ＆ドロップ<br>またはクリックで選択
+      </div>
+      <input type="file" id="fileInput" accept="image/*" style="display:none;">
     </div>
-    <div id="preview"></div>
 
-    <!-- カメラモード -->
-    <div id="cameraZone" style="display:none; text-align:center;">
-      <video id="qrVideo" width="100%" playsinline></video>
+    <!-- カメラ用 -->
+    <div id="cameraSection" style="display:none;">
+      <video id="camera" autoplay playsinline style="width:100%; border-radius:8px;"></video>
     </div>
 
     <label>読み取った文字列</label>
-    <input type="text" id="qrResult" readonly placeholder="ここに読み取った文字列が表示されます">
+    <input type="text" id="qrText" readonly placeholder="ここに読み取った文字列が表示されます">
 
     <label>誤り訂正レベル</label>
-    <select id="qrError">
+    <select id="errorLevel">
       <option value="L">L (低)</option>
       <option value="M" selected>M (中)</option>
-      <option value="Q">Q (高)</option>
-      <option value="H">H (最高)</option>
+      <option value="Q">Q (準高)</option>
+      <option value="H">H (高)</option>
     </select>
 
     <label>余白 (0〜16px)</label>
-    <input type="number" id="qrMargin" value="4" min="0" max="16">
+    <input type="number" id="margin" value="4" min="0" max="16">
 
-    <button onclick="generateQR()">QRを再生成</button>
-    <canvas id="qrCanvas"></canvas>
-    <button onclick="saveQR()">PNG保存</button>
+    <button id="generateBtn">QRを再生成</button>
+    <canvas id="qrcode"></canvas>
+    <button id="saveBtn">PNG保存</button>
   </div>
 
   <script>
-    const fileInput = document.getElementById("qrFile");
-    const uploadZone = document.getElementById("uploadZone");
-    const preview = document.getElementById("preview");
-    const qrResult = document.getElementById("qrResult");
-    const qrCanvas = document.getElementById("qrCanvas");
-    const video = document.getElementById("qrVideo");
-    let stream;
+    const inputMode = document.getElementById("inputMode");
+    const uploadSection = document.getElementById("uploadSection");
+    const cameraSection = document.getElementById("cameraSection");
+    const dropZone = document.getElementById("dropZone");
+    const fileInput = document.getElementById("fileInput");
+    const qrText = document.getElementById("qrText");
+    const qrCanvas = document.getElementById("qrcode");
+    const generateBtn = document.getElementById("generateBtn");
+    const saveBtn = document.getElementById("saveBtn");
+    const video = document.getElementById("camera");
+    let stream = null;
 
     // 入力モード切り替え
-    function toggleInputMode() {
-      const mode = document.getElementById("inputMode").value;
-      document.getElementById("uploadZone").style.display = mode === "upload" ? "block" : "none";
-      document.getElementById("cameraZone").style.display = mode === "camera" ? "block" : "none";
-      if (mode === "camera") startCamera();
-      else stopCamera();
-    }
-
-    // アップロード処理
-    fileInput.addEventListener("change", handleFile);
-    uploadZone.addEventListener("dragover", e => {
-      e.preventDefault();
-      uploadZone.style.borderColor = "#a855f7";
-    });
-    uploadZone.addEventListener("dragleave", e => {
-      e.preventDefault();
-      uploadZone.style.borderColor = "#666";
-    });
-    uploadZone.addEventListener("drop", e => {
-      e.preventDefault();
-      uploadZone.style.borderColor = "#666";
-      const file = e.dataTransfer.files[0];
-      if (file) processFile(file);
+    inputMode.addEventListener("change", () => {
+      if (inputMode.value === "upload") {
+        uploadSection.style.display = "block";
+        cameraSection.style.display = "none";
+        stopCamera();
+      } else {
+        uploadSection.style.display = "none";
+        cameraSection.style.display = "block";
+        startCamera();
+      }
     });
 
-    function handleFile(event) {
-      const file = event.target.files[0];
-      if (file) processFile(file);
-    }
+    // ファイル選択
+    dropZone.addEventListener("click", () => fileInput.click());
+    dropZone.addEventListener("dragover", e => {
+      e.preventDefault();
+      dropZone.classList.add("dragover");
+    });
+    dropZone.addEventListener("dragleave", () => dropZone.classList.remove("dragover"));
+    dropZone.addEventListener("drop", e => {
+      e.preventDefault();
+      dropZone.classList.remove("dragover");
+      handleFile(e.dataTransfer.files[0]);
+    });
+    fileInput.addEventListener("change", e => handleFile(e.target.files[0]));
 
-    function processFile(file) {
+    function handleFile(file) {
+      if (!file) return;
       const reader = new FileReader();
-      reader.onload = function(e) {
-        preview.innerHTML = `<img src="${e.target.result}" alt="preview">`;
-        decodeQRFromImage(e.target.result);
-      };
+      reader.onload = e => decodeQR(e.target.result);
       reader.readAsDataURL(file);
     }
 
     // QRコード読み取り
-    function decodeQRFromImage(dataUrl) {
+    function decodeQR(imageSrc) {
       const img = new Image();
-      img.src = dataUrl;
-      img.onload = function() {
+      img.onload = () => {
         const canvas = document.createElement("canvas");
-        const ctx = canvas.getContext("2d");
         canvas.width = img.width;
         canvas.height = img.height;
+        const ctx = canvas.getContext("2d");
         ctx.drawImage(img, 0, 0);
         const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
         const code = jsQR(imageData.data, canvas.width, canvas.height);
         if (code) {
-          qrResult.value = code.data;
+          qrText.value = code.data;
         } else {
-          qrResult.value = "QRコードが読み取れませんでした";
+          alert("QRコードが見つかりませんでした");
         }
       };
+      img.src = imageSrc;
     }
 
-    // カメラモード
-    async function startCamera() {
-      try {
-        stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
-        video.srcObject = stream;
-        video.play();
-        const scan = setInterval(() => {
-          if (video.readyState === video.HAVE_ENOUGH_DATA) {
-            const canvas = document.createElement("canvas");
-            const ctx = canvas.getContext("2d");
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
-            ctx.drawImage(video, 0, 0);
-            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-            const code = jsQR(imageData.data, canvas.width, canvas.height);
-            if (code) {
-              qrResult.value = code.data;
-              stopCamera();
-              clearInterval(scan);
-            }
-          }
-        }, 500);
-      } catch (err) {
-        alert("カメラを使用できません: " + err);
-      }
+    // カメラ起動
+    function startCamera() {
+      navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
+        .then(s => {
+          stream = s;
+          video.srcObject = stream;
+          scanLoop();
+        })
+        .catch(err => alert("カメラにアクセスできません: " + err));
     }
 
     function stopCamera() {
@@ -264,12 +208,30 @@
       }
     }
 
+    function scanLoop() {
+      if (!stream) return;
+      const canvas = document.createElement("canvas");
+      const ctx = canvas.getContext("2d");
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      const code = jsQR(imageData.data, canvas.width, canvas.height);
+      if (code) {
+        qrText.value = code.data;
+        stopCamera(); // 自動停止
+      } else {
+        requestAnimationFrame(scanLoop);
+      }
+    }
+
     // QRコード生成
-    function generateQR() {
-      const text = qrResult.value.trim();
+    generateBtn.addEventListener("click", () => {
+      const text = qrText.value.trim();
       if (!text) return alert("文字列がありません");
-      const errorLevel = document.getElementById("qrError").value;
-      const margin = parseInt(document.getElementById("qrMargin").value) || 0;
+      const errorLevel = document.getElementById("errorLevel").value;
+      const margin = parseInt(document.getElementById("margin").value) || 4;
+
       QRCode.toCanvas(qrCanvas, text, {
         errorCorrectionLevel: errorLevel,
         margin: margin,
@@ -278,19 +240,23 @@
           dark: "#000000",
           light: "#ffffff"
         }
+      }, (error) => {
+        if (error) console.error(error);
+        qrCanvas.style.display = "block"; // 生成されたら表示
       });
-    }
+    });
 
-    // 保存
-    function saveQR() {
+    // PNG保存
+    saveBtn.addEventListener("click", () => {
       const link = document.createElement("a");
-      link.download = "qr.png";
+      link.download = "qrcode.png";
       link.href = qrCanvas.toDataURL("image/png");
       link.click();
-    }
+    });
   </script>
 </body>
 </html>
+
 
 
 
