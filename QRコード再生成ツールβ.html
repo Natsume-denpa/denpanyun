@@ -12,21 +12,25 @@
       color: #eee;
       display: flex;
       justify-content: center;
-      align-items: center;
-      height: 100vh;
+      align-items: flex-start;
+      min-height: 100vh;
       margin: 0;
+      padding: 20px;
     }
     .container {
       background: #2c2c2c;
       padding: 20px;
       border-radius: 12px;
       box-shadow: 0 4px 10px rgba(0,0,0,0.4);
-      width: 360px;
+      max-width: 480px;   /* PCでは適度に狭く */
+      width: 100%;        /* スマホでは横幅いっぱい */
+      box-sizing: border-box;
     }
     h2 {
-      margin-bottom: 10px;
+      margin-bottom: 12px;
       color: #c084fc;
       font-size: 1.2rem;
+      text-align: center;
     }
     label {
       display: block;
@@ -36,18 +40,19 @@
     input[type="number"], input[type="text"], select {
       width: 100%;
       margin-bottom: 12px;
-      padding: 6px;
+      padding: 10px;
       border-radius: 6px;
       border: none;
       background: #3a3a3a;
       color: #fff;
-      font-size: 0.9rem;
+      font-size: 1rem;
+      box-sizing: border-box;
     }
     button {
       display: block;
       width: 100%;
       margin: 8px 0;
-      padding: 10px;
+      padding: 12px;
       border: none;
       border-radius: 6px;
       background: #8b5cf6;
@@ -72,8 +77,8 @@
       text-align: center;
       margin-bottom: 12px;
       cursor: pointer;
-      position: relative;   /* これを追加 */
-      overflow: hidden;     /* 安全に領域を制限 */
+      position: relative;
+      overflow: hidden;
     }
     #uploadZone.dragover {
       background: #444;
@@ -82,7 +87,7 @@
       position: absolute;
       top: 0;
       left: 0;
-      width: 100%;   /* ゾーン全体を覆う */
+      width: 100%;
       height: 100%;
       opacity: 0;
       cursor: pointer;
@@ -129,7 +134,7 @@
     <!-- カメラモード -->
     <div id="cameraArea">
       <video id="video" autoplay></video>
-      <p style="font-size:0.8rem; color:#aaa;">QRコードをかざしてください（読み取ったら自動停止）</p>
+      <p style="font-size:0.85rem; color:#aaa;">QRコードをかざしてください（読み取ったら自動停止）</p>
     </div>
 
     <label for="text">読み取った文字列</label>
@@ -316,3 +321,5 @@
   </script>
 </body>
 </html>
+
+
