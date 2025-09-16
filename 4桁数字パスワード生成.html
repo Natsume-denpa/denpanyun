@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>4桁パスワード（PIN）ジェネレーター</title>
+  <style>
+    :root {
+      --bg: #ffffff;
+      --card: #f9fafb;
+      --accent: #06b6d4;
+      --muted: #475569;
+      --text: #0f172a;
+      color-scheme: light;
+    }
+    :root[data-theme="dark"] {
+      --bg: #0f1724;
+      --card: #0b1220;
+      --accent: #06b6d4;
+      --muted: #94a3b8;
+      --text: #e6eef6;
+      color-scheme: dark;
+    }
+    *{box-sizing:border-box}
+    body{font-family:Inter,system-ui,-apple-system,"Hiragino Kaku Gothic ProN",Meiryo,sans-serif; margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--bg);color:var(--text);transition:background 0.3s,color 0.3s}
+    .card{background:var(--card);padding:2rem;border-radius:12px;box-shadow:0 8px 30px rgba(2,6,23,0.1);width:100%;max-width:520px;transition:background 0.3s}
+    h1{font-size:1.25rem;margin:0 0 0.5rem}
+    p.lead{margin:0 0 1rem;color:var(--muted)}
+    .pin-display{font-variant-numeric:tabular-nums;font-size:3.25rem;background:rgba(0,0,0,0.05);padding:0.75rem 1rem;border-radius:8px;text-align:center;letter-spacing:0.2rem;margin-bottom:1rem;transition:background 0.3s}
+    .controls{display:flex;gap:0.5rem;flex-wrap:wrap}
+    button{background:var(--accent);border:0;padding:0.6rem 0.9rem;border-radius:8px;color:#042027;font-weight:600;cursor:pointer;transition:background 0.3s,color 0.3s}
+    button.ghost{background:transparent;border:1px solid rgba(0,0,0,0.15);color:var(--muted)}
+    :root[data-theme="dark"] button.ghost{border:1px solid rgba(255,255,255,0.1)}
+    .options{display:flex;gap:1rem;align-items:center;margin-top:1rem}
+    label{display:flex;gap:0.5rem;align-items:center;font-size:0.95rem;color:var(--muted)}
+    input[type=checkbox]{width:18px;height:18px}
+    footer{margin-top:1rem;font-size:0.85rem;color:var(--muted)}
+    .theme-toggle{margin-left:auto}
+    @media(max-width:420px){.pin-display{font-size:2.25rem}}
+  </style>
+</head>
+<body>
+  <main class="card" role="main">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem">
+      <h1>4桁パスワード（PIN）ジェネレーター</h1>
+      <button id="themeToggle" class="ghost theme-toggle" aria-label="テーマ切り替え">🌙</button>
+    </div>
+    <p class="lead">0〜9 の数字を使ってランダムな 4 桁のパスワードを生成します。コピー機能が利用可能です。</p>
+
+    <div id="pin" class="pin-display" aria-live="polite">----</div>
+
+    <div class="controls">
+      <button id="generate">生成する</button>
+      <button id="copy" class="ghost">コピー</button>
+    </div>
+
+    <div class="options">
+      <label><input type="checkbox" id="allowRepeat" checked> 同じ数字の繰り返しを許可</label>
+      <label><input type="checkbox" id="noSequential"> 連続した数字を除外（1234, 4567 等）</label>
+    </div>
+
+    <footer>
+      注意: 突破されても自己責任だよ！
+    </footer>
+  </main>
+
+  <script>
+    function randInt(max){ return Math.floor(Math.random()*max); }
+
+    function generatePin({length=4, allowRepeat=true, excludeSequential=false} = {}){
+      const digits = [];
+      const triesLimit = 200;
+
+      function isSequential(arr){
+        let asc = true, desc = true;
+        for(let i=1;i<arr.length;i++){
+          if(arr[i] !== arr[i-1]+1) asc = false;
+          if(arr[i] !== arr[i-1]-1) desc = false;
+        }
+        return asc || desc;
+      }
+
+      let tries = 0;
+      while(digits.length < length && tries < triesLimit){
+        const d = randInt(10);
+        if(!allowRepeat && digits.includes(d)){ tries++; continue; }
+        digits.push(d);
+      }
+
+      if(excludeSequential && isSequential(digits)){
+        tries++;
+        if(tries < triesLimit) return generatePin({length, allowRepeat, excludeSequential});
+      }
+
+      return digits.slice(0,length).map(String).join('');
+    }
+
+    const pinEl = document.getElementById('pin');
+    const generateBtn = document.getElementById('generate');
+    const copyBtn = document.getElementById('copy');
+    const themeToggle = document.getElementById('themeToggle');
+
+    function updateDisplay(p){ pinEl.textContent = p; }
+
+    function getOptions(){
+      return {
+        allowRepeat: document.getElementById('allowRepeat').checked,
+        excludeSequential: document.getElementById('noSequential').checked
+      }
+    }
+
+    generateBtn.addEventListener('click', ()=>{
+      const opts = getOptions();
+      const p = generatePin({allowRepeat: opts.allowRepeat, excludeSequential: opts.excludeSequential});
+      updateDisplay(p);
+    });
+
+    copyBtn.addEventListener('click', async ()=>{
+      const text = pinEl.textContent;
+      if(!/^[0-9]{4}$/.test(text)){
+        alert('先に生成してください。');
+        return;
+      }
+      try{
+        await navigator.clipboard.writeText(text);
+        copyBtn.textContent = 'コピーしました';
+        setTimeout(()=>copyBtn.textContent='コピー',1500);
+      }catch(e){
+        const ta = document.createElement('textarea'); ta.value=text; document.body.appendChild(ta); ta.select();
+        try{ document.execCommand('copy'); alert('コピーしました'); }catch(e){ alert('コピーに失敗しました: ' + e); }
+        ta.remove();
+      }
+    });
+
+    // テーマ切り替え
+    function updateThemeIcon(){
+      if(document.documentElement.getAttribute('data-theme') === 'dark'){
+        themeToggle.textContent = '☀️';
+      } else {
+        themeToggle.textContent = '🌙';
+      }
+    }
+
+    themeToggle.addEventListener('click', ()=>{
+      const root = document.documentElement;
+      if(root.getAttribute('data-theme') === 'dark'){
+        root.removeAttribute('data-theme');
+        localStorage.setItem('theme','light');
+      } else {
+        root.setAttribute('data-theme','dark');
+        localStorage.setItem('theme','dark');
+      }
+      updateThemeIcon();
+    });
+
+    // デフォルトはシステム設定に合わせる
+    (function(){
+      const saved = localStorage.getItem('theme');
+      if(saved){
+        if(saved === 'dark') document.documentElement.setAttribute('data-theme','dark');
+      } else {
+        if(window.matchMedia('(prefers-color-scheme: dark)').matches){
+          document.documentElement.setAttribute('data-theme','dark');
+        }
+      }
+      updateThemeIcon();
+    })();
+
+    generateBtn.click();
+  </script>
+</body>
+</html>
