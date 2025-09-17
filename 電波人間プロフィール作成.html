@@ -1,0 +1,346 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>自己紹介カード - 電波人間風デザイン</title>
+<!-- 8bitフォント -->
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+<style>
+  body{
+    margin:0;
+    font-family: "Noto Sans JP", sans-serif;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:24px;
+    background:
+      radial-gradient(circle, rgba(255,255,255,0.2) 2px, transparent 3px) repeat,
+      #4a64c7;
+    background-size: 24px 24px;
+  }
+
+  .card-wrapper {
+    width:1000px;
+    height:1420px;
+    border-radius:24px;
+    overflow:hidden;
+    background:#cfefff;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+    border:6px solid #004c99;
+    box-sizing:border-box;
+    padding:24px;
+  }
+
+  .header {
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom: 20px;
+  }
+  .title {
+    font-size:48px;
+    font-weight:900;
+    color:#004c99;
+    text-shadow: 
+      2px 2px 0 #ffffff,
+     -2px 2px 0 #ffffff,
+      2px -2px 0 #ffffff,
+     -2px -2px 0 #ffffff,
+      0 2px 0 #ffffff,
+      2px 0 0 #ffffff,
+      0 -2px 0 #ffffff,
+     -2px 0 0 #ffffff;
+  }
+  .logo {
+    font-family: 'Press Start 2P', cursive;
+    font-size:18px;
+    color:#ffcc00;
+    letter-spacing:1px;
+    text-shadow: 
+      2px 2px 0 #000,
+     -2px 2px 0 #000,
+      2px -2px 0 #000,
+     -2px -2px 0 #000;
+  }
+
+  .main {
+    display: grid;
+    grid-template-columns: 1fr 1.3fr;
+    gap: 20px;
+  }
+  .left, .right {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .label {
+    display:inline-block;
+    padding:6px 10px;
+    background:#4ac6ff;
+    border-radius:10px;
+    font-weight:900;
+    font-size:18px;
+    color:#003344;
+    border:2px solid #0077cc;
+    text-align:center;
+    text-shadow: 
+      1px 1px 0 #ffffff,
+     -1px 1px 0 #ffffff,
+      1px -1px 0 #ffffff,
+     -1px -1px 0 #ffffff;
+  }
+
+  .panel {
+    background:#dff7ff;
+    border-radius:10px;
+    padding:10px;
+    border: 2px solid #a3e4ff;
+    font-size:16px;
+    color:#003344;
+    min-height:60px;
+  }
+
+  .small-panel {
+    min-height:40px;
+    max-width:160px;
+  }
+  .name-panel {
+    min-height:60px;
+    font-weight:bold;
+    font-size:32px;
+    overflow:hidden;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+
+  .avatar {
+    background:#dff7ff;
+    border-radius:10px;
+    min-height:220px;
+    border:2px dashed #0077cc;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    overflow:hidden;
+    cursor:pointer;
+  }
+  .avatar img{
+    width:100%;
+    height:auto;
+    object-fit:contain;
+    display:block;
+  }
+  .avatar .placeholder {
+    text-align:center;
+    color:#555;
+    font-size:14px;
+  }
+
+  .footer {
+    margin-top: 20px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+  }
+  .chip {
+    padding:6px 12px;
+    background:#4ac6ff;
+    border-radius:999px;
+    font-weight:700;
+    font-size:14px;
+    color:#003344;
+    border:2px solid #0077cc;
+    text-shadow: 
+      1px 1px 0 #ffffff,
+     -1px 1px 0 #ffffff,
+      1px -1px 0 #ffffff,
+     -1px -1px 0 #ffffff;
+  }
+  .btn {
+    padding:10px 16px;
+    border-radius:8px;
+    border:none;
+    cursor:pointer;
+    font-weight:700;
+  }
+  .btn-save {
+    background:#0ea5d6;
+    color:#fff;
+  }
+  .btn-reset {
+    background:#fff;
+    border:2px solid #0077cc;
+    color:#003344;
+  }
+</style>
+</head>
+<body>
+  <div class="card-wrapper" id="card">
+    <div class="header">
+      <div class="title">自己紹介カード</div>
+      <div class="logo">NEW 電波人間 RPG FREE!</div>
+    </div>
+
+    <div class="main">
+      <!-- 左カラム -->
+      <div class="left">
+        <div>
+          <div class="label">アバター</div>
+          <div class="avatar" id="avatarDrop">
+            <img id="avatarImg" src="" alt="" style="display:none;">
+            <div class="placeholder" id="avatarPlaceholder">
+              クリックして画像を選択
+            </div>
+            <input id="avatarFile" type="file" accept="image/*" style="display:none">
+          </div>
+        </div>
+
+        <div>
+          <div class="label">好きな作品</div>
+          <div class="panel" contenteditable="true"></div>
+        </div>
+
+        <div>
+          <div class="label">好きなアンテナ</div>
+          <div class="panel" contenteditable="true"></div>
+        </div>
+
+        <div>
+          <div class="label">好きなモンスター</div>
+          <div class="panel" contenteditable="true"></div>
+        </div>
+
+        <div>
+          <div class="label">プレイスタイル</div>
+          <div class="panel" contenteditable="true"></div>
+        </div>
+      </div>
+
+      <!-- 右カラム -->
+      <div class="right">
+        <div>
+          <div class="label">おなまえ</div>
+          <div class="panel name-panel" contenteditable="true" id="namePanel">ななし</div>
+        </div>
+        <div>
+          <div class="label">ねんれい</div>
+          <div class="panel small-panel" contenteditable="true"></div>
+        </div>
+        <div>
+          <div class="label">せいべつ</div>
+          <div class="panel small-panel" contenteditable="true"></div>
+        </div>
+
+        <div>
+          <div class="label">好きな電波人間（できれば写真付きで！）</div>
+          <div class="panel" contenteditable="true" style="min-height:120px;">
+            電波人間の名前や理由を書いてください。レア度や好きな技などもどうぞ！
+          </div>
+        </div>
+
+        <div>
+          <div class="label">ひとこと</div>
+          <div class="panel" contenteditable="true" style="min-height:100px;">
+            一言メッセージや挨拶をどうぞ！仲良くしてね。
+          </div>
+        </div>
+
+        <div>
+          <div class="label">自由記入（追加メモ）</div>
+          <div class="panel" contenteditable="true" style="min-height:100px;">
+            あればSNS、仲間募集、希望プレイ時間など。
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer" id="footer">
+      <div class="chip">@yu_ プロフ作成ツール</div>
+      <div>
+        <button id="downloadBtn" class="btn btn-save">画像として保存</button>
+        <button id="resetBtn" class="btn btn-reset">初期化</button>
+      </div>
+    </div>
+  </div>
+
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<script>
+  // Reset
+  document.getElementById('resetBtn').addEventListener('click', ()=>{
+    if(!confirm('カードを初期状態に戻しますか？')) return;
+    location.reload();
+  });
+
+  // 保存（背景を枠色に固定し、box-shadowとアバター枠を一時的にオフ）
+  document.getElementById('downloadBtn').addEventListener('click', ()=>{
+    const card = document.getElementById('card');
+    const footer = document.getElementById('footer');
+    const avatar = document.getElementById('avatarDrop');
+
+    const oldShadow = card.style.boxShadow;
+    const oldBorder = avatar.style.border;
+
+    card.style.boxShadow = "none";
+    avatar.style.border = "none";
+    footer.style.display = 'none';
+
+    html2canvas(card, {
+      backgroundColor: "#004c99", // ★ 枠色で四隅を塗る
+      scale: 1,
+      width: 1000,
+      height: 1420
+    }).then(canvas => {
+      card.style.boxShadow = oldShadow;
+      avatar.style.border = oldBorder || "2px dashed #0077cc";
+      footer.style.display = 'flex';
+
+      const a = document.createElement('a');
+      a.download = 'self_card.png';
+      a.href = canvas.toDataURL('image/png');
+      a.click();
+    });
+  });
+
+  // アバター画像アップロード
+  const avatarDrop = document.getElementById('avatarDrop');
+  const avatarFile = document.getElementById('avatarFile');
+  const avatarImg = document.getElementById('avatarImg');
+  const avatarPlaceholder = document.getElementById('avatarPlaceholder');
+
+  avatarDrop.addEventListener('click', () => {
+    avatarFile.click();
+  });
+
+  avatarFile.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if(file){
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        avatarImg.src = event.target.result;
+        avatarImg.style.display = 'block';
+        avatarPlaceholder.style.display = 'none';
+        avatarDrop.style.minHeight = "auto";
+      };
+      reader.readAsDataURL(file);
+    }
+  });
+
+  // おなまえ欄の文字サイズ自動調整
+  const namePanel = document.getElementById('namePanel');
+  function adjustFontSize() {
+    let fontSize = 48;
+    namePanel.style.fontSize = fontSize + "px";
+    while (namePanel.scrollHeight > namePanel.clientHeight || namePanel.scrollWidth > namePanel.clientWidth) {
+      fontSize--;
+      namePanel.style.fontSize = fontSize + "px";
+      if (fontSize < 12) break;
+    }
+  }
+  namePanel.addEventListener('input', adjustFontSize);
+  window.addEventListener('load', adjustFontSize);
+</script>
+</body>
+</html>
