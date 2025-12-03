@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@yu_作成</title>
+    <style>
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f9;
+            color: #333;
+            line-height: 1.6;
+        }
+        h1 {
+            color: #d9534f;
+            border-bottom: 3px solid #d9534f;
+            padding-bottom: 8px;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto; 
+            background-color: #fff;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        .section-title {
+            font-size: 1.2em;
+            color: #5cb85c;
+            margin-bottom: 15px;
+            border-left: 5px solid #5cb85c;
+            padding-left: 10px;
+        }
+        .memo-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .memo-item label {
+            width: 150px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            color: #333; 
+            flex-shrink: 0;
+        }
+        .memo-item select {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            flex-grow: 1;
+            color: #333; 
+            background-color: white; 
+            font-size: 1em;
+        }
+        .result-list {
+            list-style: none;
+            padding: 0;
+        }
+        .result-list li {
+            padding: 12px;
+            margin-bottom: 8px;
+            border-radius: 6px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 1.1em;
+            font-weight: bold;
+            background-color: #e9ecef;
+        }
+        .result-order {
+            background-color: #6c757d; 
+            color: white;
+            padding: 5px 10px;
+            border-radius: 4px;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+        .monster-name {
+            font-style: italic;
+            color: #d9534f;
+            text-align: right;
+            flex-shrink: 0;
+        }
+        .note {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #fcf8e3;
+            border: 1px solid #faebcc;
+            color: #8a6d3b;
+            border-radius: 4px;
+            font-size: 0.95em;
+        }
+        .color-display {
+            width: 15px;
+            height: 15px;
+            border-radius: 3px;
+            margin-right: 5px;
+            border: 1px solid #333;
+            background-color: white; 
+            flex-shrink: 0;
+        }
+		
+        .color-green { background-color: #28a745 !important; }
+        .color-yellow { background-color: #ffc107 !important; }
+        .color-red { background-color: #dc3545 !important; }
+        .color-blue { background-color: #007bff !important; }
+        
+        @media (max-width: 600px) {
+            body {
+                padding: 10px;
+            }
+            .container {
+                padding: 15px;
+                border-radius: 0;
+                box-shadow: none;
+            }
+            .memo-item label {
+                width: 120px;
+                font-size: 0.9em;
+            }
+            .memo-item select {
+                padding: 8px;
+                font-size: 0.9em;
+            }
+            .result-list li {
+                font-size: 1em;
+            }
+            .result-order {
+                margin-right: 10px;
+                padding: 4px 8px;
+            }
+            .monster-name {
+                font-size: 0.95em;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <h1>ステージ14 黒い豚ふざけんなツール</h1>
+
+    <div class="container">
+        <div class="section-title"> 色の並び入力 (手前 → 奥の順)</div>
+
+        <form id="color-memo-form" class="memo-form">
+            <div class="memo-item">
+                <label for="color1"><span class="result-order">1</span> <span class="color-display" id="display1"></span>手前</label>
+                <select id="color1" onchange="handleSelection(this)">
+                    <option value="">-- 選択 --</option>
+                    <option value="緑">緑</option>
+                    <option value="黄">黄</option>
+                    <option value="赤">赤</option>
+                    <option value="青">青</option>
+                </select>
+            </div>
+            <div class="memo-item">
+                <label for="color2"><span class="result-order">2</span> <span class="color-display" id="display2"></span>2番目</label>
+                <select id="color2" onchange="handleSelection(this)">
+                    <option value="">-- 選択 --</option>
+                    <option value="緑">緑</option>
+                    <option value="黄">黄</option>
+                    <option value="赤">赤</option>
+                    <option value="青">青</option>
+                </select>
+            </div>
+            <div class="memo-item">
+                <label for="color3"><span class="result-order">3</span> <span class="color-display" id="display3"></span>3番目</label>
+                <select id="color3" onchange="handleSelection(this)">
+                    <option value="">-- 選択 --</option>
+                    <option value="緑">緑</option>
+                    <option value="黄">黄</option>
+                    <option value="赤">赤</option>
+                    <option value="青">青</option>
+                </select>
+            </div>
+            <div class="memo-item">
+                <label for="color4"><span class="result-order">4</span> <span class="color-display" id="display4"></span>奥</label>
+                <select id="color4" onchange="handleSelection(this)">
+                    <option value="">-- 選択 --</option>
+                    <option value="緑">緑</option>
+                    <option value="黄">黄</option>
+                    <option value="赤">赤</option>
+                    <option value="青">青</option>
+                </select>
+            </div>
+        </form>
+
+        <div class="section-title">⚔️ 討伐順と対応モンスター</div>
+        
+        <ul id="result-display" class="result-list">
+            <li>色を入力してください。</li>
+        </ul>
+
+        <div class="note">
+            **【モンスター対応表】**<br>
+            緑 → グリーンジェリー | 黄 → イエローミスト<br>
+            赤 → レッドオウル | 青 → ブルートロル
+        </div>
+    </div>
+
+    <script>
+        const monsterMap = {
+            "緑": "グリーンジェリー",
+            "黄": "イエローミスト",
+            "赤": "レッドオウル",
+            "青": "ブルートロル"
+        };
+
+        const colorStyleMap = {
+            "緑": { bg: '#28a745', class: 'color-green' },
+            "黄": { bg: '#ffc107', class: 'color-yellow' },
+            "赤": { bg: '#dc3545', class: 'color-red' },
+            "青": { bg: '#007bff', class: 'color-blue' },
+        };
+
+        const selectIds = ['color1', 'color2', 'color3', 'color4'];
+
+        function handleSelection(changedSelect) {
+            updateMemo();
+            updateSelectOptions(changedSelect);
+        }
+
+        function updateSelectOptions(changedSelect) {
+            const selectedColors = new Set();
+            selectIds.forEach(id => {
+                const select = document.getElementById(id);
+                if (select.value) {
+                    selectedColors.add(select.value);
+                }
+            });
+
+            selectIds.forEach(id => {
+                const select = document.getElementById(id);
+                const currentSelection = select.value;
+                
+                Array.from(select.options).forEach(option => {
+                    const optionValue = option.value;
+                    if (optionValue !== "") {
+                        option.disabled = (selectedColors.has(optionValue) && optionValue !== currentSelection);
+                    }
+                });
+            });
+        }
+
+        function updateMemo() {
+            const colors = selectIds.map(id => document.getElementById(id).value);
+            const resultDisplay = document.getElementById('result-display');
+            resultDisplay.innerHTML = ''; 
+            let isEmpty = true;
+
+            colors.forEach((color, index) => {
+                const order = index + 1;
+                const listItem = document.createElement('li');
+                const displayId = `display${order}`;
+                const colorDisplay = document.getElementById(displayId);
+                
+                if (color && colorStyleMap[color]) {
+                    colorDisplay.className = `color-display ${colorStyleMap[color].class}`;
+                } else {
+                    colorDisplay.className = 'color-display';
+                }
+
+                
+                if (color) {
+                    isEmpty = false;
+                    const monster = monsterMap[color] || '不明なモンスター';
+                    const colorCode = colorStyleMap[color].bg || '#6c757d'; 
+
+                    listItem.innerHTML = `
+                        <div style="display:flex; align-items:center;">
+                            <span class="result-order" style="background-color: ${colorCode};">討伐${order}</span>
+                            <span>${color}</span>
+                        </div>
+                        <span class="monster-name">${monster}</span>
+                    `;
+                } else {
+                    listItem.innerHTML = `
+                        <div style="display:flex; align-items:center;">
+                            <span class="result-order" style="background-color: #6c757d;">討伐${order}</span>
+                            <span>未選択</span>
+                        </div>
+                        <span class="monster-name">...</span>
+                    `;
+                }
+                resultDisplay.appendChild(listItem);
+            });
+
+            if (isEmpty) {
+                resultDisplay.innerHTML = '<li>色を入力してください。</li>';
+            }
+        }
+
+        window.onload = () => {
+            updateMemo();
+            updateSelectOptions(); 
+        };
+    </script>
+</body>
+</html>
