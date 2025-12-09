@@ -3,11 +3,12 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1, maximum-scale=1, user-scalable=no" />
-<title>電波人間 自己紹介カード生成サイトV2</title>
+<title>電波人間 自己紹介カード生成サイト</title>
 
 <link href="https://fonts.googleapis.com/css2?family=DotGothic16&display=swap" rel="stylesheet">
 
 <style>
+  /* 文字サイズの自動調整を無効化（スマホでのレイアウト崩れ防止） */
   html {
     -webkit-text-size-adjust: 100%;
     text-size-adjust: 100%;
@@ -21,26 +22,31 @@
       #4a64c7;
     background-size: 24px 24px;
     min-height: 100vh;
-    padding: 40px 0;
+    padding: 0; /* paddingは削除し、scalerのmarginで調整 */
     box-sizing: border-box;
-    overflow-x: hidden;
+    overflow-x: hidden; /* 横スクロールバーを出さない */
     
+    /* ★修正点1：Flexboxを廃止。これで縦潰れが治ります */
     display: block; 
-    text-align: center;
+    text-align: center; /* 中身を中央揃え */
   }
 
+  /* ★修正点2：縮小用の箱の設定を厳格化 */
   #scaler {
-    display: inline-block;
-    width: 1000px;
-    min-width: 1000px;
-    transform-origin: top center;
-    transition: transform 0.2s;
-    margin-bottom: 50px;
-    text-align: left;
+    display: inline-block; /* text-align: centerで中央に来るように */
+    width: 1000px;      /* ★絶対に1000px確保 */
+    min-width: 1000px;  /* スマホでも幅を譲らない */
+    transform-origin: top center; /* 上中央を基準に縮小 */
+    margin-top: 40px;   /* 上の余白 */
+    text-align: left;   /* 内部のテキストは左揃えに戻す */
+    
+    /* 描画崩れ防止のおまじない */
+    backface-visibility: hidden;
+    transform-style: preserve-3d;
   }
 
   .card-wrapper {
-    width: 1000px;
+    width: 1000px; /* 幅固定 */
     height: auto;        
     max-height: 1420px;  
     min-height: 800px;   
@@ -413,25 +419,44 @@
 <script>
   function fitCardToScreen() {
     const cardWrapper = document.getElementById('card');
+    const scaler = document.getElementById('scaler');
+    
+    // カードの本来の幅
     const cardWidth = 1000;
+    
+    // 現在の画面幅
     const screenWidth = window.innerWidth;
-    const margin = 40;
+    const margin = 20; // 左右のマージン合計
+
+    // カードの高さ（動的に変わる可能性があるため都度取得）
     const currentHeight = cardWrapper.offsetHeight;
 
     if (screenWidth < cardWidth + margin) {
+      // 画面が狭い場合、縮小率を計算
       const scale = (screenWidth - margin) / cardWidth;
-      const scaler = document.getElementById('scaler');
+      
       scaler.style.transform = `scale(${scale})`;
       
-      document.body.style.height = (currentHeight * scale + 100) + 'px'; 
+      // スケール後の高さを計算して、scaler自体の高さ（margin-bottom）を調整
+      // transformはフロー上の高さを変えないため、JSで補正が必要
+      // scaleによって小さくなった分、下の余白が空きすぎるのを防ぐため、
+      // 親やラッパーの高さを調整するアプローチをとる
+      
+      // ここでは、scaleで小さくなった「見た目の高さ」に合わせてbodyの高さを調整するのではなく、
+      // scalerが占める領域を調整したいが、margin-bottom等で簡易対応
+      const heightDiff = currentHeight * (1 - scale);
+      scaler.style.marginBottom = `-${heightDiff}px`;
+      
     } else {
-      document.getElementById('scaler').style.transform = 'scale(1)';
-      document.body.style.height = 'auto';
+      // PCなど十分広い場合
+      scaler.style.transform = 'scale(1)';
+      scaler.style.marginBottom = '50px';
     }
   }
 
   window.addEventListener('resize', fitCardToScreen);
   window.addEventListener('load', fitCardToScreen);
+  // 画像読み込みや文字入力で高さが変わったときも実行
   const resizeObserver = new ResizeObserver(() => fitCardToScreen());
   resizeObserver.observe(document.getElementById('card'));
 
@@ -471,13 +496,14 @@
         favDenpa.style.display = 'none';
     }
 
+    // 撮影時はスクロール位置をトップに（バグ防止）
     window.scrollTo(0, 0);
 
     html2canvas(card, {
       backgroundColor: "#004c99", 
       scale: 1.5,
-      width: 1000,
-      windowWidth: 1000, 
+      width: 1000, 
+      windowWidth: 1000, // スマホでもPC幅でレンダリングさせる
       useCORS: true
     }).then(canvas => {
       
@@ -526,6 +552,7 @@
         avatarImg.style.display = 'block';
         avatarPlaceholder.style.display = 'none';
         avatarDrop.style.border = "none";
+        // 画像反映後にリサイズ計算
         setTimeout(fitCardToScreen, 100);
       };
       reader.readAsDataURL(file);
