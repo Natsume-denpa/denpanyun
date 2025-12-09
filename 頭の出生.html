@@ -362,6 +362,22 @@
             align-items: center;
         }
         
+        .node-title::before {
+            content: "STEP " attr(data-step);
+            font-size: 10px;
+            background: #e2e8f0;
+            color: #64748b;
+            padding: 1px 6px;
+            border-radius: 4px;
+            margin-right: 8px;
+            display: inline-block;
+        }
+
+        .node-title[data-step="1"]::before {
+            background: var(--color-catch);
+            color: #fff;
+        }
+
         @media (max-width: 768px) {
             body { padding: 20px 10px; }
             h1 { font-size: 24px; }
@@ -486,7 +502,7 @@ const rawData = `
 いぬみみ/80/こぐま/15/うさみみ/おだんご/クワガタ//10/うさみみ/ハート
 まきがい/80/たてまる/75/コック/ロケット/タワー//0//
 コック/5/ロケット/30/キャッスル/まきがい/タワー/ロケット/15/キャンディ/ヒレ
-おんがくか/50/おにぎり/10/たいよう/おんがくか///0//
+おんがくか/50/おにぎり/10/たいよう/おんがくか///50/おんがくか/たいよう
 かえる/50/くま/25/スター////15/しょくパン/おさかな
 スター/5/ダイヤ/10/たいよう////10/みかづき/わっか
 ハート/10/うさみみ/10/わっか////0//
@@ -806,6 +822,8 @@ function renderRoute(targetName, container, depth, visited, mode) {
                     
                     const title = document.createElement('div');
                     title.className = 'node-title';
+                    const costVal = (headCosts[parentName] !== undefined) ? headCosts[parentName] + 1 : '?';
+                    title.dataset.step = costVal;
                     title.textContent = `${parentName} の素`;
                     node.appendChild(title);
 
