@@ -23,16 +23,21 @@
     padding: 40px 20px;
     box-sizing: border-box;
     overflow-y: auto;
+    overflow-x: hidden;
   }
 
   #scaler {
+    width: 1000px;
+    min-width: 1000px;
     transform-origin: top center;
     transition: transform 0.2s;
     margin-bottom: 50px;
+    flex-shrink: 0;
   }
 
   .card-wrapper {
     width: 1000px;
+    min-width: 1000px;
     height: auto;        
     max-height: 1420px;  
     min-height: 800px;   
@@ -46,6 +51,7 @@
     position: relative;
     display: flex;
     flex-direction: column;
+    flex-shrink: 0;
   }
 
   .header {
@@ -64,6 +70,7 @@
     color: #004c99;
     line-height: 1;
     text-shadow: 3px 3px 0 #fff;
+    white-space: nowrap;
   }
 
   .logo {
@@ -80,6 +87,7 @@
       2px 2px 0 #000;
     transform: rotate(-3deg);
     display: inline-block;
+    white-space: nowrap;
   }
 
   .main {
@@ -106,6 +114,7 @@
     border: 2px solid #0077cc;
     text-align: center;
     text-shadow: 1px 1px 0 #fff;
+    white-space: nowrap;
   }
 
   .panel {
