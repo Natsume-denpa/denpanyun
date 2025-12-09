@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>電波人間 頭の出生ルート検索</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #0ea5e9;
+            --primary-dark: #0284c7;
+            --secondary: #64748b;
+            --glass-bg: rgba(255, 255, 255, 0.85);
+            --glass-border: rgba(255, 255, 255, 0.5);
+            --text-main: #0f172a;
+            --text-sub: #475569;
+            --color-mix: #ef4444;
+            --color-normal: #10b981;
+            --color-catch: #f59e0b;
+            --color-rare: #8b5cf6;
+            --radius: 16px;
+            --shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+        }
+
+        body {
+            font-family: 'Noto Sans JP', sans-serif;
+            margin: 0;
+            padding: 40px 20px;
+            line-height: 1.6;
+            color: var(--text-main);
+            min-height: 100vh;
+            background-image: url('https://raw.githubusercontent.com/Natsume-denpa/denpanyun/main/background.png');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            background-repeat: no-repeat;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(255, 255, 255, 0.1);
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            color: #fff;
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 30px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            letter-spacing: 0.05em;
+        }
+
+        .glass-panel {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+            padding: 30px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .input-wrapper {
+            position: relative;
+            max-width: 600px;
+            margin: 0 auto 25px;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 16px 20px;
+            font-size: 18px;
+            border: 1px solid rgba(0,0,0,0.1);
+            border-radius: 50px;
+            outline: none;
+            transition: all 0.2s;
+            box-sizing: border-box;
+            background: rgba(255, 255, 255, 0.9);
+            text-align: center;
+            font-weight: 700;
+            color: var(--text-main);
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        input[type="text"]:focus {
+            background: #fff;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.2);
+        }
+
+        .options-group {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+
+        .radio-label {
+            cursor: pointer;
+            padding: 8px 20px;
+            border-radius: 20px;
+            background: rgba(255,255,255,0.5);
+            border: 1px solid rgba(0,0,0,0.1);
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-sub);
+            transition: all 0.2s;
+        }
+
+        .radio-label:hover {
+            background-color: #fff;
+        }
+
+        input[type="radio"] { display: none; }
+
+        .radio-label:has(input:checked) {
+            background-color: var(--primary);
+            border-color: var(--primary);
+            color: white;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        button.search-btn {
+            padding: 14px 40px;
+            font-size: 16px;
+            background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            box-shadow: 0 4px 10px rgba(14, 165, 233, 0.3);
+        }
+
+        button.search-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(14, 165, 233, 0.4);
+        }
+
+        button.search-btn:active {
+            transform: translateY(0);
+        }
+
+        #result-area {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .route-card {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(8px);
+            border-radius: 16px;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+            overflow: hidden;
+            animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            border: 1px solid rgba(255,255,255,0.4);
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .card-top-indicator { height: 6px; width: 100%; }
+        .method-mix .card-top-indicator { background: var(--color-mix); }
+        .method-normal .card-top-indicator { background: var(--color-normal); }
+        .method-catch .card-top-indicator { background: var(--color-catch); }
+        .method-rare .card-top-indicator { background: var(--color-rare); }
+
+        .card-content { padding: 25px; }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+        }
+
+        .target-group {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .head-icon-lg {
+            width: 64px; height: 64px;
+            border-radius: 12px;
+            background: #fff;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            padding: 4px;
+            object-fit: contain;
+        }
+
+        .head-title {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .head-name {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--text-main);
+            line-height: 1.2;
+        }
+
+        .head-subtitle {
+            font-size: 13px;
+            color: var(--text-sub);
+            margin-top: 4px;
+        }
+
+        .badge-group {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .badge {
+            font-size: 12px;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-weight: 600;
+            color: #fff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .bg-mix { background-color: var(--color-mix); }
+        .bg-normal { background-color: var(--color-normal); }
+        .bg-catch { background-color: var(--color-catch); }
+        .bg-rare { background-color: var(--color-rare); }
+        .bg-info { background-color: var(--secondary); }
+
+        .parents-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(248, 250, 252, 0.8);
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid rgba(0,0,0,0.03);
+            margin-bottom: 20px;
+        }
+        
+        .parent-unit {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .head-icon-md {
+            width: 48px; height: 48px;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            padding: 4px;
+            object-fit: contain;
+        }
+
+        .parent-label {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .operator {
+            font-size: 20px;
+            color: #94a3b8;
+            margin: 0 20px;
+            font-weight: 700;
+        }
+
+        details {
+            margin-top: 15px;
+            border: 1px solid rgba(0,0,0,0.08);
+            border-radius: 8px;
+            overflow: hidden;
+            background: #fff;
+            transition: all 0.3s;
+        }
+
+        details[open] {
+            border-color: var(--primary);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        summary {
+            padding: 12px 20px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            color: var(--primary);
+            background: transparent;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            user-select: none;
+            transition: background 0.2s;
+            list-style: none;
+        }
+
+        summary::-webkit-details-marker { display: none; }
+        summary:hover { background-color: #f0f9ff; }
+
+        .ingredients-content {
+            padding: 20px;
+            border-top: 1px solid rgba(0,0,0,0.08);
+            background: #fafafa;
+        }
+
+        .tree-node {
+            position: relative;
+            padding-left: 24px;
+            margin-bottom: 20px;
+            border-left: 2px solid #e2e8f0;
+        }
+
+        .tree-node:last-child { margin-bottom: 0; }
+        
+        .node-title {
+            position: relative;
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-sub);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+        }
+
+        .node-title::before {
+            content: '';
+            position: absolute;
+            left: -27px;
+            top: 50%;
+            width: 10px;
+            height: 2px;
+            background: #e2e8f0;
+        }
+
+        .error-msg {
+            color: #fff;
+            font-weight: 700;
+            text-align: center;
+            padding: 20px;
+            background: rgba(239, 68, 68, 0.9);
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+
+        .note-text {
+            text-align: center;
+            color: var(--text-sub);
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        #loading-overlay {
+            display: none; 
+            position: fixed; 
+            bottom: 20px; right: 20px; 
+            background: rgba(0,0,0,0.7); 
+            color: white; 
+            padding: 10px 20px; 
+            border-radius: 20px; 
+            font-size: 12px;
+            z-index: 999;
+        }
+    </style>
+</head>
+<body>
+
+<div id="loading-overlay">浜田が炊きこんでいます...</div>
+
+<div class="container">
+    <h1>電波人間 頭の出生ルート検索</h1>
+
+    <div class="glass-panel control-panel">
+        <div class="input-wrapper">
+            <input type="text" id="targetHead" list="headList" placeholder="作りたい頭の名前 (例: たいよう)">
+            <datalist id="headList"></datalist>
+        </div>
+        
+        <div class="options-group">
+            <label class="radio-label">
+                <input type="radio" name="searchMode" value="all" checked>
+                <span>全ルート</span>
+            </label>
+            <label class="radio-label">
+                <input type="radio" name="searchMode" value="prob">
+                <span>高確率のみ</span>
+            </label>
+            <label class="radio-label">
+                <input type="radio" name="searchMode" value="steps">
+                <span>最短手数のみ</span>
+            </label>
+        </div>
+
+        <button class="search-btn" onclick="searchRoute()">検索開始</button>
+    </div>
+
+    <div id="result-area"></div>
+</div>
+
+<script>
+const rawData = `
+まる/100/まる/75/こぐま/しずく/あまつゆ/たまねぎ/30/よこまる/まめ
+よこまる/100/よこまる/40/キャンディ/ロボ/でんち/トゲトゲ/30/まる/まめ
+たてまる/100/たてまる/30/ロケット/まきがい/タワー//25/つぼ/コック
+さんかく/100/さんかく/30/ダイヤ/ルビー///50/まる/おにぎり
+しかく/100/しかく/30/でこ/ぼこ/ブロック//75/まる/かどまる
+かどまる/100/かどまる/50/ロボ/でんち/トゲトゲ//0//
+おにぎり/100/おにぎり/20/いぬみみ////25/でんち/おんがくか
+しずく/95/まる/67/メラメラ/りゅうせい/つぼ/スポーティ/0//
+こぐま/95/まる/50/くま/ピエロ/ひつじ/ねこみみ/30/くま/かえる
+あまつゆ/95/まる/67/メラメラ/りゅうせい///0//
+ロボ/95/まる/2/デビル////0//
+とんがり/95/たてまる/50/ルビー/イカ///0//
+でんち/95/しかく/0/////10/トゲトゲ/デビル
+たまご/95/たてまる/50/とんがり/しずく///0//
+たまねぎ/90/まる/50/つぼ/メラメラ/りゅうせい/スポーティ/75/スポーティ/チューリップ
+イカ/80/さんかく/50/トゲトゲ/ロケット/ダイヤ//2/あまつゆ/みかづき
+ルビー/80/さんかく/50/ダイヤ////30/まめ/みかづき
+スポーティ/80/メラメラ/33/チューリップ////0//
+キャンディ/80/ロボ/50/でんち/ロボ/トゲトゲ//20/ハート/おさかな
+ピエロ/80/くま/25/おだんご/うさみみ/クワガタ//0//
+まめ/80/よこまる/10/みかづき////30/でんち/おかっぱ
+ひつじ/80/ねこみみ/33/うさみみ/おだんご/クワガタ//0//
+タワー/80/たてまる/25/コック/おかっぱ///40/まきがい/コック
+ブロック/80/しかく/33/でこ/ぼこ/キャッスル//0//
+でこ/80/しかく/67/ブロック/ぼこ///20/ぼこ/キャッスル
+ぼこ/80/しかく/33/コック/でこ///20/でこ/キャッスル
+チューリップ/90/よこまる/15/ハート/おかっぱ///0//
+キャッスル/50/タワー/20/しょくパン////30/ダイヤ/スター
+おかっぱ/50/まめ/33/シルクハット////30/クワガタ/デビル
+おさかな/5/まる/30/おさかな/かえる///0//
+シルクハット/10/しかく/33/ブロック/おかっぱ///15/しょくパン/てんしゅ
+しょくパン/10/しかく/33/コック/ぼこ///15/シルクハット/てんしゅ
+てんしゅ/5/タワー/33/シルクハット/キャッスル/タワー//0//
+ねこみみ/80/まる/50/うさみみ/おだんご/クワガタ//0//
+トゲトゲ/80/でんち/5/デビル////0//
+メラメラ/80/あまつゆ/30/チューリップ/つぼ/りゅうせい/スポーティ/75/スポーティ/チューリップ
+ダイヤ/80/さんかく/5/スター////20/キャッスル/スター
+りゅうせい/80/あまつゆ/67/メラメラ/スポーティ///33/メラメラ/コック
+クワガタ/50/ピエロ/10/ハート/うさみみ/おだんご//30/まめ/みかづき
+うさみみ/50/いぬみみ/10/ハート/クワガタ/おだんご//0//
+おだんご/50/ピエロ/10/ハート/クワガタ/うさみみ//0//
+デビル/10/でんち/15/ヒレ////33/まめ/みかづき
+みかづき/10/まめ/0/////33/ダイヤ/スター
+ヒレ/5/いぬみみ/33/みかづき/クワガタ///10/シルクハット/はね
+はね/5/ねこみみ/33/デビル/おだんご///0//
+つぼ/80/まる/30/チューリップ/メラメラ/りゅうせい/スポーティ/75/スポーティ/チューリップ
+ロケット/80/たてまる/75/コック/まきがい/タワー//0//
+くま/80/まる/30/うさみみ/おだんご/クワガタ//30/イカ/かえる
+いぬみみ/80/こぐま/15/うさみみ/おだんご/クワガタ//10/うさみみ/ハート
+まきがい/80/たてまる/75/コック/ロケット/タワー//0//
+コック/5/ロケット/30/キャッスル/まきがい/タワー/ロケット/15/キャンディ/ヒレ
+おんがくか/50/おにぎり/10/たいよう/おんがくか///0//
+かえる/50/くま/25/スター////15/しょくパン/おさかな
+スター/5/ダイヤ/10/たいよう////10/みかづき/わっか
+ハート/10/うさみみ/10/わっか////0//
+たいよう/10/まる/100/まる////0//
+わっか/5/まる/30/わっか////0//
+`;
+
+const headsDB = {};
+const baseHeads = ["まる", "たてまる", "よこまる", "かどまる", "さんかく"];
+const rareHeads = ["たまご"];
+const headCosts = {}; 
+const headImages = {}; 
+
+const REPO_OWNER = "Natsume-denpa";
+const REPO_NAME = "denpanyun";
+const BRANCH = "main"; 
+const API_URL = `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/headpic?ref=${BRANCH}`;
+const RAW_BASE_URL = `https://raw.githubusercontent.com/${REPO_OWNER}/${REPO_NAME}/${BRANCH}/headpic/`;
+
+function initData() {
+    rawData.trim().split('\n').forEach(line => {
+        if(!line) return;
+        const cols = line.split('/');
+        const name = cols[0].trim();
+        const sameEvoTargets = [cols[4], cols[5], cols[6], cols[7]].filter(s => s && s.trim() !== "").map(s => s.trim());
+
+        headsDB[name] = {
+            name: name,
+            primaryRate: parseInt(cols[3]) || 0,
+            sameEvo: sameEvoTargets,
+            mixRate: parseInt(cols[8]) || 0,
+            mixPartner: cols[9] ? cols[9].trim() : "",
+            mixResult: cols[10] ? cols[10].trim() : ""
+        };
+        headCosts[name] = 999;
+    });
+
+    const dataListElement = document.getElementById('headList');
+    Object.keys(headsDB).sort().forEach(key => {
+        const option = document.createElement('option');
+        option.value = key;
+        dataListElement.appendChild(option);
+    });
+
+    [...baseHeads, ...rareHeads].forEach(name => {
+        if(headCosts[name]) headCosts[name] = 0;
+    });
+
+    let changed = true;
+    while(changed) {
+        changed = false;
+        Object.keys(headsDB).forEach(headName => {
+            const head = headsDB[headName];
+            const currentCost = headCosts[headName];
+            
+            if (head.mixResult && head.mixPartner && headsDB[head.mixPartner]) {
+                const partnerCost = headCosts[head.mixPartner];
+                const childName = head.mixResult;
+                const newCost = Math.max(currentCost, partnerCost) + 1;
+                if (headCosts[childName] > newCost) {
+                    headCosts[childName] = newCost;
+                    changed = true;
+                }
+            }
+
+            head.sameEvo.forEach(target => {
+                const newCost = currentCost + 1;
+                if (headCosts[target] > newCost) {
+                    headCosts[target] = newCost;
+                    changed = true;
+                }
+            });
+        });
+    }
+
+    fetchImageList();
+}
+
+async function fetchImageList() {
+    const loadingOverlay = document.getElementById('loading-overlay');
+    loadingOverlay.style.display = 'block';
+    
+    try {
+        const res = await fetch(API_URL);
+        if (!res.ok) throw new Error(`API Error: ${res.status}`);
+        const files = await res.json();
+        
+        files.forEach(file => {
+            const match = file.name.match(/^[^_]+_(.+)_0x/);
+            let name = "";
+            if (match && match[1]) {
+                name = match[1];
+            } else {
+                name = file.name.replace(/\.[^/.]+$/, "");
+            }
+            headImages[name] = RAW_BASE_URL + file.name;
+        });
+    } catch (e) {
+        console.warn("Image fetch failed, using fallback mode.", e);
+    } finally {
+        loadingOverlay.style.display = 'none';
+    }
+}
+
+function getImgHtml(name, sizeClass = "head-icon-md") {
+    const src = headImages[name];
+    if (!src) {
+        return `<div class="${sizeClass}" style="display:flex;align-items:center;justify-content:center;background:#fff;color:#ccc;font-size:10px;border-radius:10px;border:1px solid #eee;">No Img</div>`;
+    }
+    return `<img src="${src}" class="${sizeClass}" alt="${name}" onerror="this.style.display='none'">`;
+}
+
+function getRecipeCost(recipe) {
+    if (recipe.type === 'catch' || recipe.type === 'rare') return 0;
+    let maxParentCost = 0;
+    recipe.parents.forEach(p => {
+        if (headCosts[p] !== undefined) {
+            maxParentCost = Math.max(maxParentCost, headCosts[p]);
+        }
+    });
+    return maxParentCost + 1;
+}
+
+function findRecipes(targetName) {
+    const recipes = [];
+    
+    if (baseHeads.includes(targetName)) {
+        recipes.push({ type: 'catch', parents: [], label: 'QRキャッチ、ノーマルキャッチ', rate: 100 });
+        return recipes;
+    }
+    if (rareHeads.includes(targetName)) {
+        recipes.push({ type: 'rare', parents: [], label: 'レアキャッチ', rate: 100 });
+        return recipes;
+    }
+
+    Object.values(headsDB).forEach(head => {
+        if (head.mixResult === targetName) {
+            recipes.push({
+                type: 'mixed',
+                parents: [head.name, head.mixPartner],
+                rate: head.mixRate
+            });
+        }
+        if (head.sameEvo.includes(targetName)) {
+            const count = head.sameEvo.length;
+            const rate = count > 0 ? (head.primaryRate / count).toFixed(1) : 0;
+            recipes.push({
+                type: 'normal',
+                parents: [head.name, head.name],
+                rate: parseFloat(rate)
+            });
+        }
+    });
+    return recipes;
+}
+
+function filterRecipes(recipes, mode) {
+    if (recipes.length === 0) return [];
+    if (recipes[0].type === 'catch' || recipes[0].type === 'rare') return recipes;
+
+    let result = [...recipes];
+    result.forEach(r => r.stepCost = getRecipeCost(r));
+
+    if (mode === 'prob') {
+        result.sort((a, b) => b.rate - a.rate);
+        return [result[0]];
+    } 
+    else if (mode === 'steps') {
+        result.sort((a, b) => {
+            if (a.stepCost !== b.stepCost) return a.stepCost - b.stepCost;
+            return b.rate - a.rate;
+        });
+        return [result[0]];
+    }
+    else {
+        result.sort((a, b) => b.rate - a.rate);
+        return result;
+    }
+}
+
+function searchRoute() {
+    const target = document.getElementById('targetHead').value.trim();
+    const resultArea = document.getElementById('result-area');
+    
+    const modeElements = document.getElementsByName('searchMode');
+    let mode = 'all';
+    for(let el of modeElements) if(el.checked) mode = el.value;
+
+    resultArea.innerHTML = '';
+
+    if (!target) return;
+    
+    const exists = headsDB[target] || baseHeads.includes(target) || rareHeads.includes(target);
+    
+    if (!exists) {
+        resultArea.innerHTML = `<div class="error-msg">「${target}」という頭は見つかりませんでした。</div>`;
+        return;
+    }
+
+    renderRoute(target, resultArea, 0, [], mode);
+}
+
+function renderRoute(targetName, container, depth, visited, mode) {
+    if (visited.includes(targetName)) {
+        const div = document.createElement('div');
+        div.className = "note-text";
+        div.style.fontSize = "12px";
+        div.innerText = `(循環参照: ${targetName})`;
+        container.appendChild(div);
+        return;
+    }
+
+    let recipes = findRecipes(targetName);
+    const newVisited = [...visited, targetName];
+    recipes = filterRecipes(recipes, mode);
+
+    if (recipes.length === 0) {
+        container.innerHTML += "<div class='note-text'>作成ルートが見つかりません</div>";
+        return;
+    }
+
+    recipes.forEach(recipe => {
+        const card = document.createElement('div');
+        const isMixed = recipe.type === 'mixed';
+        const isCatch = recipe.type === 'catch';
+        const isRare = recipe.type === 'rare';
+        const isItem = isCatch || isRare;
+        
+        if (isCatch) card.className = 'route-card method-catch';
+        else if (isRare) card.className = 'route-card method-rare';
+        else card.className = `route-card ${isMixed ? 'method-mix' : 'method-normal'}`;
+        
+        card.innerHTML = `<div class="card-top-indicator"></div>`;
+
+        const content = document.createElement('div');
+        content.className = 'card-content';
+        
+        let typeLabel = 'その他';
+        let bgClass = 'bg-info';
+        if (isMixed) { typeLabel = '混合出生'; bgClass = 'bg-mix'; }
+        else if (isCatch) { typeLabel = 'キャッチ'; bgClass = 'bg-catch'; }
+        else if (isRare) { typeLabel = 'レア'; bgClass = 'bg-rare'; }
+        else { typeLabel = '通常出生'; bgClass = 'bg-normal'; }
+
+        const stepVal = getRecipeCost(recipe);
+        
+        const header = document.createElement('div');
+        header.className = 'card-header';
+        header.innerHTML = `
+            <div class="target-group">
+                ${getImgHtml(targetName, 'head-icon-lg')}
+                <div class="head-title">
+                    <span class="head-name">${targetName}</span>
+                    <span class="head-subtitle">${typeLabel}</span>
+                </div>
+            </div>
+            <div class="badge-group">
+                <span class="badge ${bgClass}">${typeLabel}</span>
+                ${!isItem ? `<span class="badge bg-info">手数 ${stepVal}</span>` : ''}
+                ${!isItem ? `<span class="badge bg-info">${recipe.rate}%</span>` : ''}
+            </div>
+        `;
+        content.appendChild(header);
+
+        if (isItem) {
+            const note = document.createElement('div');
+            note.className = 'note-text';
+            note.innerHTML = `<strong>${recipe.label}</strong> で入手してください。`;
+            content.appendChild(note);
+        } else {
+            const parentsDiv = document.createElement('div');
+            parentsDiv.className = 'parents-container';
+            const p1 = recipe.parents[0];
+            const p2 = recipe.parents[1];
+            
+            parentsDiv.innerHTML = `
+                <div class="parent-unit">
+                    ${getImgHtml(p1, 'head-icon-md')}
+                    <span class="parent-label">${p1}</span>
+                </div>
