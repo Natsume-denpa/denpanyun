@@ -387,14 +387,14 @@
 </head>
 <body>
 
-<div id="loading-overlay">浜田が炊きこんでいます...</div>
+<div id="loading-overlay">画像を読み込んでいます...</div>
 
 <div class="container">
     <h1>電波人間 頭の出生ルート検索</h1>
 
     <div class="glass-panel control-panel">
         <div class="input-wrapper">
-            <input type="text" id="targetHead" list="headList" placeholder="作りたい頭の名前 (例: たいよう)">
+            <input type="text" id="targetHead" list="headList" placeholder="作りたい頭の名前 (例: ロボ, いぬみみ)">
             <datalist id="headList"></datalist>
         </div>
         
@@ -753,3 +753,72 @@ function renderRoute(targetName, container, depth, visited, mode) {
                     ${getImgHtml(p1, 'head-icon-md')}
                     <span class="parent-label">${p1}</span>
                 </div>
+                <div class="operator">×</div>
+                <div class="parent-unit">
+                    ${getImgHtml(p2, 'head-icon-md')}
+                    <span class="parent-label">${p2}</span>
+                </div>
+            `;
+            content.appendChild(parentsDiv);
+
+            const details = document.createElement('details');
+            const summary = document.createElement('summary');
+            
+            const btnTextStart = `▼ 親（${p1}, ${p2}）の入手方法を表示`;
+            const btnTextEnd = `▲ 親（${p1}, ${p2}）の入手方法を閉じる`;
+            
+            summary.textContent = btnTextStart;
+            
+            details.addEventListener('toggle', () => {
+                summary.textContent = details.open ? btnTextEnd : btnTextStart;
+            });
+
+            details.appendChild(summary);
+
+            const ingredientsContent = document.createElement('div');
+            ingredientsContent.className = 'ingredients-content';
+            details.appendChild(ingredientsContent);
+
+            let isLoaded = false;
+            const loadContent = () => {
+                if(isLoaded) return;
+                isLoaded = true;
+
+                const uniqueParents = [...new Set(recipe.parents)];
+                uniqueParents.forEach(parentName => {
+                    const node = document.createElement('div');
+                    node.className = 'tree-node';
+                    
+                    const title = document.createElement('div');
+                    title.className = 'node-title';
+                    title.textContent = `${parentName} の素`;
+                    node.appendChild(title);
+
+                    renderRoute(parentName, node, depth + 1, newVisited, mode);
+                    ingredientsContent.appendChild(node);
+                });
+            };
+
+            if (mode !== 'all' || depth === 0) {
+                loadContent();
+                details.open = true;
+                summary.textContent = btnTextEnd; 
+            } else {
+                details.addEventListener('toggle', () => {
+                    if (details.open) loadContent();
+                });
+            }
+
+            content.appendChild(details);
+        }
+
+        card.appendChild(content);
+        container.appendChild(card);
+    });
+}
+
+initData();
+
+</script>
+</body>
+</html>
