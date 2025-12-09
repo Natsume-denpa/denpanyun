@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>電波人間 頭の出生ルート検索</title>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
@@ -10,61 +10,59 @@
             --primary: #0ea5e9;
             --primary-dark: #0284c7;
             --secondary: #64748b;
-            --glass-bg: rgba(255, 255, 255, 0.85);
-            --glass-border: rgba(255, 255, 255, 0.5);
+            --glass-bg: rgba(255, 255, 255, 0.95);
+            --glass-border: rgba(255, 255, 255, 0.6);
             --text-main: #0f172a;
-            --text-sub: #334155;
+            --text-sub: #475569;
             --color-mix: #ef4444;
             --color-normal: #10b981;
             --color-catch: #f59e0b;
             --color-rare: #8b5cf6;
-            --radius: 12px;
-            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-        }
-        * {
-            box-sizing: border-box;
+            
+            --depth-1: #ef4444;
+            --depth-2: #f59e0b;
+            --depth-3: #10b981;
+            --depth-4: #3b82f6;
+            --depth-5: #8b5cf6;
+            --depth-6: #ec4899;
         }
 
         body {
             font-family: 'Noto Sans JP', sans-serif;
             margin: 0;
-            padding: 20px 10px;
-            line-height: 1.5;
+            padding: 40px 20px;
+            line-height: 1.6;
             color: var(--text-main);
             min-height: 100vh;
-        }
-
-        .bg-layer {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
             background-image: url('https://raw.githubusercontent.com/Natsume-denpa/denpanyun/main/background.png');
             background-size: cover;
             background-position: center;
-            z-index: -2;
+            background-attachment: fixed;
+            background-repeat: no-repeat;
         }
 
-        .bg-overlay {
+        body::before {
+            content: "";
             position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(255, 255, 255, 0.15);
-            backdrop-filter: blur(2px);
-            -webkit-backdrop-filter: blur(2px);
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(255, 255, 255, 0.2);
             z-index: -1;
+            pointer-events: none;
         }
 
         .container {
-            max-width: 800px;
+            max-width: 900px;
             margin: 0 auto;
-            padding-bottom: 50px;
         }
 
         h1 {
             text-align: center;
             color: #fff;
-            font-size: 24px;
+            font-size: 32px;
             font-weight: 700;
-            margin: 10px 0 20px;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.4);
+            margin-bottom: 30px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            letter-spacing: 0.05em;
         }
 
         .glass-panel {
@@ -72,143 +70,141 @@
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
             border: 1px solid var(--glass-border);
-            border-radius: var(--radius);
+            border-radius: 16px;
             box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
-            padding: 20px;
-            margin-bottom: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
             text-align: center;
         }
 
         .input-wrapper {
             position: relative;
-            width: 100%;
-            margin-bottom: 15px;
+            max-width: 600px;
+            margin: 0 auto 25px;
         }
 
         input[type="text"] {
             width: 100%;
-            padding: 14px;
-            font-size: 16px;
+            padding: 16px 20px;
+            font-size: 18px;
             border: 1px solid rgba(0,0,0,0.1);
             border-radius: 50px;
             outline: none;
-            background: rgba(255, 255, 255, 0.9);
+            transition: all 0.2s;
+            box-sizing: border-box;
+            background: rgba(255, 255, 255, 0.95);
             text-align: center;
             font-weight: 700;
             color: var(--text-main);
             box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
-            -webkit-appearance: none;
         }
 
         input[type="text"]:focus {
             background: #fff;
             border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.2);
+            box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.2);
         }
 
         .options-group {
             display: flex;
             justify-content: center;
-            gap: 8px;
-            margin-bottom: 20px;
+            gap: 12px;
+            margin-bottom: 25px;
             flex-wrap: wrap;
         }
 
         .radio-label {
             cursor: pointer;
-            padding: 8px 12px;
+            padding: 8px 20px;
             border-radius: 20px;
             background: rgba(255,255,255,0.6);
             border: 1px solid rgba(0,0,0,0.1);
-            font-size: 13px;
+            font-size: 14px;
             font-weight: 500;
             color: var(--text-sub);
             transition: all 0.2s;
-            white-space: nowrap;
         }
+
+        .radio-label:hover { background-color: #fff; }
+
+        input[type="radio"] { display: none; }
 
         .radio-label:has(input:checked) {
             background-color: var(--primary);
             border-color: var(--primary);
             color: white;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
 
-        input[type="radio"] { display: none; }
-
         button.search-btn {
-            width: 100%; /* ｹﾂｹﾞが浜田 */
-            max-width: 300px;
-            padding: 14px;
+            padding: 14px 40px;
             font-size: 16px;
             background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
             color: white;
             border: none;
             border-radius: 50px;
             cursor: pointer;
+            transition: all 0.2s;
             font-weight: 700;
+            letter-spacing: 0.05em;
             box-shadow: 0 4px 10px rgba(14, 165, 233, 0.3);
-            -webkit-tap-highlight-color: transparent;
         }
 
-        button.search-btn:active {
-            transform: scale(0.98);
+        button.search-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(14, 165, 233, 0.4);
         }
 
         #result-area {
             display: flex;
             flex-direction: column;
-            gap: 15px;
+            gap: 20px;
         }
 
         .route-card {
             background: rgba(255, 255, 255, 0.95);
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
             overflow: hidden;
-            animation: slideUp 0.3s ease-out;
-            border: 1px solid rgba(255,255,255,0.5);
+            animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            border: 1px solid rgba(0,0,0,0.05);
         }
 
         @keyframes slideUp {
-            from { opacity: 0; transform: translateY(10px); }
+            from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
-        .card-top-indicator { height: 5px; width: 100%; }
+        .card-top-indicator { height: 6px; width: 100%; }
         .method-mix .card-top-indicator { background: var(--color-mix); }
         .method-normal .card-top-indicator { background: var(--color-normal); }
         .method-catch .card-top-indicator { background: var(--color-catch); }
         .method-rare .card-top-indicator { background: var(--color-rare); }
 
-        .card-content { padding: 15px 20px; }
+        .card-content { padding: 20px; }
 
         .card-header {
             display: flex;
-            flex-direction: row;
             justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 15px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid #eee;
-            flex-wrap: wrap;
-            gap: 10px;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
         }
 
         .target-group {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 15px;
         }
 
         .head-icon-lg {
-            width: 50px; height: 50px;
+            width: 56px; height: 56px;
             border-radius: 10px;
             background: #fff;
-            border: 1px solid #eee;
-            padding: 2px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            padding: 4px;
             object-fit: contain;
-            flex-shrink: 0;
         }
 
         .head-title {
@@ -217,7 +213,7 @@
         }
 
         .head-name {
-            font-size: 18px;
+            font-size: 20px;
             font-weight: 700;
             color: var(--text-main);
             line-height: 1.2;
@@ -226,16 +222,14 @@
         .head-subtitle {
             font-size: 12px;
             color: var(--text-sub);
-            margin-top: 2px;
+            margin-top: 4px;
         }
 
         .badge-group {
             display: flex;
-            gap: 5px;
+            gap: 6px;
             align-items: center;
             flex-wrap: wrap;
-            justify-content: flex-end;
-            margin-left: auto;
         }
 
         .badge {
@@ -244,7 +238,6 @@
             border-radius: 4px;
             font-weight: 600;
             color: #fff;
-            white-space: nowrap;
         }
 
         .bg-mix { background-color: var(--color-mix); }
@@ -267,23 +260,22 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 5px;
+            gap: 6px;
         }
 
         .head-icon-md {
-            width: 40px; height: 40px;
+            width: 42px; height: 42px;
             background: #fff;
             border-radius: 8px;
-            border: 1px solid #ddd;
-            padding: 2px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            padding: 3px;
             object-fit: contain;
         }
 
         .parent-label {
-            font-size: 12px;
+            font-size: 13px;
             font-weight: 700;
             color: var(--text-main);
-            text-align: center;
         }
 
         .operator {
@@ -294,76 +286,96 @@
         }
 
         details {
-            border: 1px solid #e2e8f0;
+            margin-top: 10px;
+            border: 1px solid rgba(0,0,0,0.08);
             border-radius: 8px;
             overflow: hidden;
             background: #fff;
+            transition: all 0.2s;
         }
 
         details[open] {
-            border-color: var(--primary);
+            border-color: #cbd5e1;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
         }
 
         summary {
-            padding: 12px 15px;
+            padding: 10px 15px;
             cursor: pointer;
             font-weight: 600;
             font-size: 13px;
             color: var(--primary);
-            background: transparent;
+            background: #fff;
             display: flex;
             align-items: center;
             justify-content: space-between;
             user-select: none;
+            transition: background 0.2s;
             list-style: none;
         }
-
+        
+        summary:hover { background-color: #f8fafc; }
         summary::-webkit-details-marker { display: none; }
-        summary:active { background-color: #f0f9ff; }
 
         .ingredients-content {
-            padding: 15px;
-            border-top: 1px solid #eee;
-            background: #fcfcfc;
+            padding: 0;
+            background: #fff;
+            border-top: 1px solid rgba(0,0,0,0.05);
         }
 
         .tree-node {
+            padding-left: 12px;
+            margin: 10px;
+            border-left-width: 5px;
+            border-left-style: solid;
+            border-radius: 0 6px 6px 0;
+            background: #fafafa;
+            border-color: #cbd5e1;
             position: relative;
-            padding-left: 20px;
-            margin-bottom: 15px;
-            border-left: 2px solid #e2e8f0;
         }
 
-        .tree-node:last-child { margin-bottom: 0; }
+        .tree-node .tree-node {
+            margin: 8px 0 0 0;
+            width: 100%;
+        }
+
+        .tree-node[data-depth] { border-color: var(--secondary); }
+        
+        .tree-node[data-depth]:nth-child(n) { border-color: var(--depth-1); background: rgba(239, 68, 68, 0.02); }
+        
+        .tree-node[data-depth="1"] { border-color: var(--depth-1); background: rgba(239, 68, 68, 0.03); }
+        .tree-node[data-depth="2"] { border-color: var(--depth-2); background: rgba(245, 158, 11, 0.03); }
+        .tree-node[data-depth="3"] { border-color: var(--depth-3); background: rgba(16, 185, 129, 0.03); }
+        .tree-node[data-depth="4"] { border-color: var(--depth-4); background: rgba(59, 130, 246, 0.03); }
+        .tree-node[data-depth="5"] { border-color: var(--depth-5); background: rgba(139, 92, 246, 0.03); }
+        .tree-node[data-depth="6"] { border-color: var(--depth-6); background: rgba(236, 72, 153, 0.03); }
+        
+        .tree-node[data-depth="7"] { border-color: var(--depth-1); }
+        .tree-node[data-depth="8"] { border-color: var(--depth-2); }
         
         .node-title {
-            position: relative;
             font-size: 12px;
             font-weight: 700;
             color: var(--text-sub);
-            margin-bottom: 8px;
+            padding: 8px 0 4px 0;
             display: flex;
             align-items: center;
         }
-
-        .node-title::before {
-            content: '';
-            position: absolute;
-            left: -22px;
-            top: 50%;
-            width: 8px;
-            height: 2px;
-            background: #e2e8f0;
+        
+        @media (max-width: 768px) {
+            body { padding: 20px 10px; }
+            h1 { font-size: 24px; }
+            .glass-panel { padding: 20px; }
+            .tree-node { margin: 8px 0; }
         }
 
         .error-msg {
             color: #fff;
             font-weight: 700;
             text-align: center;
-            padding: 15px;
+            padding: 20px;
             background: rgba(239, 68, 68, 0.9);
-            border-radius: 8px;
-            font-size: 14px;
+            border-radius: 12px;
         }
 
         .note-text {
@@ -371,54 +383,23 @@
             color: var(--text-sub);
             font-weight: 500;
             font-size: 13px;
+            padding: 10px;
         }
-
+        
         #loading-overlay {
             display: none; 
             position: fixed; 
             bottom: 20px; right: 20px; 
             background: rgba(0,0,0,0.7); 
             color: white; 
-            padding: 8px 16px; 
+            padding: 10px 20px; 
             border-radius: 20px; 
             font-size: 12px;
             z-index: 999;
-            backdrop-filter: blur(4px);
-        }
-        
-        .no-img {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #ccc;
-            font-size: 9px;
-            background: #f8fafc;
-        }
-
-        @media (max-width: 480px) {
-            .card-header {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-            .badge-group {
-                margin-left: 0;
-                justify-content: flex-start;
-                margin-top: 5px;
-            }
-            .parents-container {
-                padding: 10px;
-            }
-            .operator {
-                margin: 0 10px;
-            }
         }
     </style>
 </head>
 <body>
-
-<!-- 背景レイヤー -->
-<div class="bg-layer"></div>
-<div class="bg-overlay"></div>
 
 <div id="loading-overlay">画像を読み込んでいます...</div>
 
@@ -427,7 +408,7 @@
 
     <div class="glass-panel control-panel">
         <div class="input-wrapper">
-            <input type="text" id="targetHead" list="headList" placeholder="頭の名前 (例: ロボ)">
+            <input type="text" id="targetHead" list="headList" placeholder="作りたい頭の名前 (例: ロボ)">
             <datalist id="headList"></datalist>
         </div>
         
@@ -438,11 +419,11 @@
             </label>
             <label class="radio-label">
                 <input type="radio" name="searchMode" value="prob">
-                <span>高確率</span>
+                <span>高確率のみ</span>
             </label>
             <label class="radio-label">
                 <input type="radio" name="searchMode" value="steps">
-                <span>最短</span>
+                <span>最短手数のみ</span>
             </label>
         </div>
 
@@ -613,9 +594,9 @@ async function fetchImageList() {
 function getImgHtml(name, sizeClass = "head-icon-md") {
     const src = headImages[name];
     if (!src) {
-        return `<div class="${sizeClass} no-img">No Img</div>`;
+        return `<div class="${sizeClass}" style="display:flex;align-items:center;justify-content:center;background:#fff;color:#ccc;font-size:10px;border-radius:10px;border:1px solid #eee;">No Img</div>`;
     }
-    return `<img src="${src}" class="${sizeClass}" alt="${name}" onerror="this.onerror=null;this.parentElement.innerHTML='<div class=\\'${sizeClass} no-img\\'>Err</div>'">`;
+    return `<img src="${src}" class="${sizeClass}" alt="${name}" onerror="this.style.display='none'">`;
 }
 
 function getRecipeCost(recipe) {
@@ -821,6 +802,7 @@ function renderRoute(targetName, container, depth, visited, mode) {
                 uniqueParents.forEach(parentName => {
                     const node = document.createElement('div');
                     node.className = 'tree-node';
+                    node.dataset.depth = (depth + 1);
                     
                     const title = document.createElement('div');
                     title.className = 'node-title';
