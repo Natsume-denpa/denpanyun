@@ -8,7 +8,6 @@
 <link href="https://fonts.googleapis.com/css2?family=DotGothic16&display=swap" rel="stylesheet">
 
 <style>
-  /* 文字サイズの自動調整を無効化（スマホでのレイアウト崩れ防止） */
   html {
     -webkit-text-size-adjust: 100%;
     text-size-adjust: 100%;
@@ -22,31 +21,28 @@
       #4a64c7;
     background-size: 24px 24px;
     min-height: 100vh;
-    padding: 0; /* paddingは削除し、scalerのmarginで調整 */
+    padding: 0; 
     box-sizing: border-box;
-    overflow-x: hidden; /* 横スクロールバーを出さない */
-    
-    /* ★修正点1：Flexboxを廃止。これで縦潰れが治ります */
-    display: block; 
-    text-align: center; /* 中身を中央揃え */
+    overflow-x: hidden;
+    display: block;
+    /* text-align: center; を削除 */
   }
 
-  /* ★修正点2：縮小用の箱の設定を厳格化 */
   #scaler {
-    display: inline-block; /* text-align: centerで中央に来るように */
-    width: 1000px;      /* ★絶対に1000px確保 */
-    min-width: 1000px;  /* スマホでも幅を譲らない */
-    transform-origin: top center; /* 上中央を基準に縮小 */
-    margin-top: 40px;   /* 上の余白 */
-    text-align: left;   /* 内部のテキストは左揃えに戻す */
+    display: block; /* inline-blockからblockへ変更 */
+    width: 1000px;
+    min-width: 1000px;
     
-    /* 描画崩れ防止のおまじない */
-    backface-visibility: hidden;
-    transform-style: preserve-3d;
+    /* ★重要：左上を基準に変形させる */
+    transform-origin: top left;
+    
+    transition: transform 0.2s;
+    margin-top: 40px;
+    /* margin-leftはJSで制御します */
   }
 
   .card-wrapper {
-    width: 1000px; /* 幅固定 */
+    width: 1000px;
     height: auto;        
     max-height: 1420px;  
     min-height: 800px;   
@@ -426,31 +422,35 @@
     
     // 現在の画面幅
     const screenWidth = window.innerWidth;
-    const margin = 20; // 左右のマージン合計
-
-    // カードの高さ（動的に変わる可能性があるため都度取得）
+    
+    // 現在のカードの高さ
     const currentHeight = cardWrapper.offsetHeight;
 
-    if (screenWidth < cardWidth + margin) {
-      // 画面が狭い場合、縮小率を計算
-      const scale = (screenWidth - margin) / cardWidth;
-      
-      scaler.style.transform = `scale(${scale})`;
-      
-      // スケール後の高さを計算して、scaler自体の高さ（margin-bottom）を調整
-      // transformはフロー上の高さを変えないため、JSで補正が必要
-      // scaleによって小さくなった分、下の余白が空きすぎるのを防ぐため、
-      // 親やラッパーの高さを調整するアプローチをとる
-      
-      // ここでは、scaleで小さくなった「見た目の高さ」に合わせてbodyの高さを調整するのではなく、
-      // scalerが占める領域を調整したいが、margin-bottom等で簡易対応
-      const heightDiff = currentHeight * (1 - scale);
-      scaler.style.marginBottom = `-${heightDiff}px`;
-      
+    let scale = 1;
+
+    // 画面幅が1000px + 余白(40px) より小さい場合のみ縮小
+    if (screenWidth < cardWidth + 40) {
+        // 左右に20pxずつの余白を残して縮小
+        scale = (screenWidth - 40) / cardWidth;
     } else {
-      // PCなど十分広い場合
-      scaler.style.transform = 'scale(1)';
-      scaler.style.marginBottom = '50px';
+        scale = 1;
+    }
+
+    // ★重要：左上基準で変形
+    scaler.style.transformOrigin = "top left";
+    scaler.style.transform = `scale(${scale})`;
+
+    // ★中央寄せの計算
+    // 「画面幅」から「縮小後のカード幅」を引き、2で割った値を左マージンにする
+    const leftMargin = (screenWidth - (cardWidth * scale)) / 2;
+    scaler.style.marginLeft = `${Math.max(0, leftMargin)}px`;
+
+    // 高さの調整（scalerの後の余白確保）
+    if(scale < 1) {
+        // 見た目の高さと実際の高さの差分を、下のマージンを引くことで調整
+        scaler.style.marginBottom = `-${currentHeight * (1 - scale) - 50}px`; 
+    } else {
+        scaler.style.marginBottom = "50px";
     }
   }
 
@@ -503,7 +503,7 @@
       backgroundColor: "#004c99", 
       scale: 1.5,
       width: 1000, 
-      windowWidth: 1000, // スマホでもPC幅でレンダリングさせる
+      windowWidth: 1000, 
       useCORS: true
     }).then(canvas => {
       
@@ -552,7 +552,6 @@
         avatarImg.style.display = 'block';
         avatarPlaceholder.style.display = 'none';
         avatarDrop.style.border = "none";
-        // 画像反映後にリサイズ計算
         setTimeout(fitCardToScreen, 100);
       };
       reader.readAsDataURL(file);
