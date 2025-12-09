@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ルート画像合成ツール</title>
+  <style>
+    :root {
+      --bg-color: #121212;
+      --panel-bg: #1e1e1e;
+      --text-main: #e0e0e0;
+      --text-sub: #a0a0a0;
+      --accent: #3b82f6;
+      --accent-hover: #2563eb;
+      --danger: #ef4444;
+      --danger-hover: #dc2626;
+      --discord: #5865F2;
+      --discord-hover: #4752c4;
+      --border: #333;
+      --radius: 8px;
+    }
+
+    body {
+      font-family: 'Helvetica Neue', Arial, sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+      min-height: 100vh;
+      box-sizing: border-box;
+    }
+
+    .container {
+      display: grid;
+      grid-template-columns: 350px 1fr;
+      gap: 20px;
+      width: 100%;
+      max-width: 1200px;
+    }
+
+    @media (max-width: 900px) {
+      .container {
+        grid-template-columns: 1fr;
+      }
+      .preview-area { order: 1; }
+      .controls { order: 2; }
+    }
+
+    .controls, .preview-area {
+      background: var(--panel-bg);
+      border-radius: var(--radius);
+      padding: 20px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+      border: 1px solid var(--border);
+    }
+
+    h2, h3 {
+      margin-top: 0;
+      font-weight: 600;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 10px;
+      margin-bottom: 15px;
+      font-size: 1.1rem;
+      color: var(--accent);
+    }
+
+    .home-btn {
+      display: block;
+      width: 100%;
+      text-align: center;
+      padding: 12px;
+      margin-bottom: 20px;
+      background-color: #374151;
+      color: #fff;
+      text-decoration: none;
+      border-radius: var(--radius);
+      font-weight: bold;
+      box-sizing: border-box;
+      transition: background 0.2s;
+    }
+    .home-btn:hover {
+      background-color: #4b5563;
+    }
+
+    .drop-zone {
+      border: 2px dashed var(--border);
+      padding: 20px 10px;
+      text-align: center;
+      margin-bottom: 10px;
+      color: var(--text-sub);
+      cursor: pointer;
+      border-radius: var(--radius);
+      transition: all 0.2s;
+      background: #252525;
+      font-size: 0.9rem;
+    }
+    .drop-zone:hover {
+      border-color: var(--accent);
+      color: var(--text-main);
+      background: #2a2a2a;
+    }
+    .preview-thumb {
+      max-width: 80px;
+      max-height: 80px;
+      display: none;
+      margin: 5px auto;
+      border-radius: 4px;
+      border: 1px solid var(--border);
+    }
+
+    input[type="file"] { display: none; }
+    
+    input[type="text"], select, input[type="url"] {
+      width: 100%;
+      padding: 8px 10px;
+      background: #2c2c2c;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      color: var(--text-main);
+      box-sizing: border-box;
+      margin-bottom: 5px;
+    }
+    input[type="text"]:focus, select:focus, input[type="url"]:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+
+    .qr-group {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+    .qr-input-group label {
+      display: block;
+      font-size: 0.8rem;
+      color: var(--text-sub);
+      margin-bottom: 4px;
+    }
+
+    .slider-group {
+      margin-bottom: 12px;
+    }
+    .slider-group label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.85rem;
+      color: var(--text-sub);
+      margin-bottom: 5px;
+    }
+    input[type="range"] {
+      width: 100%;
+      height: 6px;
+      background: #444;
+      border-radius: 3px;
+      outline: none;
+      -webkit-appearance: none;
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 16px;
+      height: 16px;
+      background: var(--accent);
+      border-radius: 50%;
+      cursor: pointer;
+    }
+
+    #canvas { display: none; }
+    #preview {
+      width: 100%;
+      height: auto;
+      border-radius: 4px;
+      border: 1px solid var(--border);
+      background: #000;
+      display: none;
+    }
+
+    .action-panel {
+      margin-top: 20px;
+      padding-top: 20px;
+      border-top: 1px solid var(--border);
+    }
+
+    .btn-group {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    button {
+      width: 100%;
+      padding: 12px;
+      font-size: 1rem;
+      font-weight: 600;
+      border: none;
+      border-radius: var(--radius);
+      cursor: pointer;
+      color: white;
+      transition: opacity 0.2s, transform 0.1s;
+    }
+    button:active { transform: translateY(1px); }
+    
+    #downloadButton { background: var(--accent); }
+    #downloadButton:hover { background: var(--accent-hover); }
+
+    #discordButton { background: var(--discord); }
+    #discordButton:hover { background: var(--discord-hover); }
+
+    #resetButton { background: var(--danger); }
+    #resetButton:hover { background: var(--danger-hover); }
+
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .hidden { display: none !important; }
+
+    .checkbox-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+      font-size: 0.9rem;
+    }
+    input[type="color"] {
+      border: none;
+      width: 30px;
+      height: 30px;
+      background: none;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  
+  <div class="controls">
+    <a href="https://natsume-denpa.github.io/denpanyun/" class="home-btn">← ホームに戻る</a>
+
+    <h2>Settings</h2>
+    
+    <div style="margin-bottom: 20px;">
+      <label style="font-size:0.9rem; color:var(--text-sub);">背景画像</label>
+      <div class="drop-zone" id="mainDrop">クリック または D&D</div>
+      <input type="file" accept="image/*" id="mainInput">
+      <img id="mainThumb" class="preview-thumb" alt="背景画像">
+    </div>
+
+    <h3>QR Layout</h3>
+    <select id="modeSelect">
+      <option value="2">2枚モード（左右下部）</option>
+      <option value="4">4枚モード（4隅）</option>
+    </select>
+
+    <div id="qr-top-row" class="qr-group">
+      <div class="qr-input-group">
+        <label>左 (先1)</label>
+        <input type="text" id="leftTopText" value="先１">
+        <div class="drop-zone" id="leftTopDrop">画像選択</div>
+        <input type="file" accept="image/*" id="leftTopInput">
+        <img id="leftTopThumb" class="preview-thumb">
+      </div>
+      <div class="qr-input-group">
+        <label>右 (後1)</label>
+        <input type="text" id="rightTopText" value="後１">
+        <div class="drop-zone" id="rightTopDrop">画像選択</div>
+        <input type="file" accept="image/*" id="rightTopInput">
+        <img id="rightTopThumb" class="preview-thumb">
+      </div>
+    </div>
+
+    <div id="qr-bottom-row" class="qr-group hidden">
+      <div class="qr-input-group">
+        <label>左下 (先2)</label>
+        <input type="text" id="leftQRText" value="先２">
+        <div class="drop-zone" id="leftQRDrop">画像選択</div>
+        <input type="file" accept="image/*" id="leftQRInput">
+        <img id="leftThumb" class="preview-thumb">
+      </div>
+      <div class="qr-input-group">
+        <label>右下 (後2)</label>
+        <input type="text" id="rightQRText" value="後２">
+        <div class="drop-zone" id="rightQRDrop">画像選択</div>
+        <input type="file" accept="image/*" id="rightQRInput">
+        <img id="rightThumb" class="preview-thumb">
+      </div>
+    </div>
+
+    <div style="margin-top:20px;">
+      <button id="resetButton">設定をリセット</button>
+    </div>
+  </div>
+
+  <div class="preview-area">
+    <h2>Preview & Export</h2>
+    <div style="text-align:center; min-height:200px; display:flex; align-items:center; justify-content:center; background:#000; border-radius:4px; margin-bottom:20px;">
+      <img id="preview" alt="ここにプレビューが表示されます">
+      <span id="placeholderText" style="color:#555;">背景画像を設定してください</span>
+    </div>
+
+    <div id="adjustments">
+      <h3>Adjustments</h3>
+      
+      <div class="checkbox-wrapper">
+        <label><input type="checkbox" id="toggleText" checked> テキストを表示</label>
+        <input type="color" id="textColorPicker" value="#000000" title="テキスト色">
+      </div>
+
+      <div class="slider-group">
+        <label>QRサイズ <span>Scale</span></label>
+        <input type="range" id="qr-size" min="5" max="40" value="15">
+      </div>
+      
+      <div class="slider-group">
+        <label>テキストサイズ <span>Size</span></label>
+        <input type="range" id="text-size" min="10" max="150" value="45">
+      </div>
+      <div class="slider-group">
+        <label>テキスト縦位置 <span>V-Offset</span></label>
+        <input type="range" id="text-vertical-offset" min="-200" max="200" value="0">
+      </div>
+
+      <div class="qr-group" style="margin-bottom:0;">
+        <div class="slider-group">
+          <label>左QR横位置</label>
+          <input type="range" id="left-qr-offset" min="-700" max="800" value="0">
+        </div>
+        <div class="slider-group">
+          <label>右QR横位置</label>
+          <input type="range" id="right-qr-offset" min="-1200" max="200" value="0">
+        </div>
+      </div>
+      
+      <div id="slider-top" class="slider-group">
+        <label>縦位置調整 (上/下)</label>
+        <input type="range" id="top-qr-vertical-offset" min="-500" max="500" value="0">
+      </div>
+      <div id="slider-bottom" class="slider-group hidden">
+        <label>下QR縦位置</label>
+        <input type="range" id="bottom-qr-vertical-offset" min="-500" max="500" value="0">
+      </div>
+    </div>
+
+    <div class="action-panel">
+      <h3>Export Actions</h3>
+      
+      <div style="margin-bottom: 15px;">
+        <label style="font-size:0.8rem; color:var(--text-sub);">Discord Webhook URL</label>
+        <input type="url" id="discordWebhookUrl" placeholder="https://discord.com/api/webhooks/...">
+      </div>
+
+      <div class="btn-group">
+        <button id="downloadButton" style="display:none;">画像をダウンロード</button>
+        <button id="discordButton" style="display:none;">Discordに送信</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<canvas id="canvas"></canvas>
+
+<script>
+const elements = {
+  inputs: {
+    main: document.getElementById('mainInput'),
+    lt: document.getElementById('leftTopInput'),
+    rt: document.getElementById('rightTopInput'),
+    l: document.getElementById('leftQRInput'),
+    r: document.getElementById('rightQRInput'),
+  },
+  drops: {
+    main: document.getElementById('mainDrop'),
+    lt: document.getElementById('leftTopDrop'),
+    rt: document.getElementById('rightTopDrop'),
+    l: document.getElementById('leftQRDrop'),
+    r: document.getElementById('rightQRDrop'),
+  },
+  thumbs: {
+    main: document.getElementById('mainThumb'),
+    lt: document.getElementById('leftTopThumb'),
+    rt: document.getElementById('rightTopThumb'),
+    l: document.getElementById('leftThumb'),
+    r: document.getElementById('rightThumb'),
+  },
+  texts: {
+    lt: document.getElementById('leftTopText'),
+    rt: document.getElementById('rightTopText'),
+    l: document.getElementById('leftQRText'),
+    r: document.getElementById('rightQRText'),
+  },
+  controls: {
+    leftOffset: document.getElementById('left-qr-offset'),
+    rightOffset: document.getElementById('right-qr-offset'),
+    topOffset: document.getElementById('top-qr-vertical-offset'),
+    bottomOffset: document.getElementById('bottom-qr-vertical-offset'),
+    qrSize: document.getElementById('qr-size'),
+    textSize: document.getElementById('text-size'),
+    textVOffset: document.getElementById('text-vertical-offset'),
+    toggleText: document.getElementById('toggleText'),
+    colorPicker: document.getElementById('textColorPicker'),
+    modeSelect: document.getElementById('modeSelect'),
+    webhook: document.getElementById('discordWebhookUrl'),
+  },
+  ui: {
+    preview: document.getElementById('preview'),
+    placeholder: document.getElementById('placeholderText'),
+    downloadBtn: document.getElementById('downloadButton'),
+    discordBtn: document.getElementById('discordButton'),
+    resetBtn: document.getElementById('resetButton'),
+    canvas: document.getElementById('canvas'),
+    qrTopRow: document.getElementById('qr-top-row'),
+    qrBottomRow: document.getElementById('qr-bottom-row'),
+    sliderTop: document.getElementById('slider-top'),
+    sliderBottom: document.getElementById('slider-bottom'),
+  }
+};
+
+const ctx = elements.ui.canvas.getContext('2d');
+
+let state = {
+  images: { main: null, lt: null, rt: null, l: null, r: null },
+};
+
+function init() {
+  const savedUrl = localStorage.getItem('discordWebhookUrl');
+  if(savedUrl) elements.controls.webhook.value = savedUrl;
+
+  setupDropZone(elements.drops.main, elements.inputs.main, elements.thumbs.main, 'main');
+  setupDropZone(elements.drops.lt, elements.inputs.lt, elements.thumbs.lt, 'lt');
+  setupDropZone(elements.drops.rt, elements.inputs.rt, elements.thumbs.rt, 'rt');
+  setupDropZone(elements.drops.l, elements.inputs.l, elements.thumbs.l, 'l');
+  setupDropZone(elements.drops.r, elements.inputs.r, elements.thumbs.r, 'r');
+
+  Object.values(elements.controls).forEach(el => {
+    if(el.type === 'range' || el.type === 'text' || el.type === 'color' || el.type === 'checkbox') {
+      el.addEventListener('input', merge);
+      el.addEventListener('change', merge);
+    }
+  });
+
+  elements.controls.modeSelect.addEventListener('change', updateMode);
+  Object.values(elements.texts).forEach(el => el.addEventListener('input', merge));
+
+  elements.ui.downloadBtn.addEventListener('click', downloadImage);
+  elements.ui.discordBtn.addEventListener('click', sendToDiscord);
+  elements.ui.resetBtn.addEventListener('click', resetAll);
+  elements.controls.webhook.addEventListener('change', (e) => {
+    localStorage.setItem('discordWebhookUrl', e.target.value);
+  });
+
+  updateMode();
+}
+
+function setupDropZone(zone, input, thumb, key) {
+  const highlight = () => { zone.style.borderColor = 'var(--accent)'; zone.style.background = '#333'; };
+  const unhighlight = () => { zone.style.borderColor = 'var(--border)'; zone.style.background = '#252525'; };
+
+  zone.addEventListener('click', () => input.click());
+  zone.addEventListener('dragover', e => { e.preventDefault(); highlight(); });
+  zone.addEventListener('dragleave', () => unhighlight());
+  zone.addEventListener('drop', e => {
+    e.preventDefault(); unhighlight();
+    if (e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0], thumb, key);
+  });
+  input.addEventListener('change', () => {
+    if (input.files.length) handleFile(input.files[0], thumb, key);
+  });
+}
+
+function handleFile(file, thumb, key) {
+  const reader = new FileReader();
+  reader.onload = e => {
+    thumb.src = e.target.result;
+    thumb.style.display = 'block';
+    const img = new Image();
+    img.onload = () => {
+      state.images[key] = img;
+      merge();
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+function updateMode() {
+  const isTwo = (elements.controls.modeSelect.value === '2');
+  if (isTwo) {
+    elements.ui.qrBottomRow.classList.add('hidden');
+    elements.ui.sliderBottom.classList.add('hidden');
+    document.querySelector('#slider-top label').textContent = '縦位置調整';
+  } else {
+    elements.ui.qrBottomRow.classList.remove('hidden');
+    elements.ui.sliderBottom.classList.remove('hidden');
+    document.querySelector('#slider-top label').textContent = '上QR縦位置';
+  }
+  merge();
+}
+
+function merge() {
+  const mainImg = state.images.main;
+  if (!mainImg) {
+    elements.ui.preview.style.display = 'none';
+    elements.ui.placeholder.style.display = 'block';
+    elements.ui.downloadBtn.style.display = 'none';
+    elements.ui.discordBtn.style.display = 'none';
+    return;
+  }
+
+  const W = mainImg.width;
+  const H = mainImg.height;
+  elements.ui.canvas.width = W;
+  elements.ui.canvas.height = H;
+  ctx.clearRect(0, 0, W, H);
+  ctx.drawImage(mainImg, 0, 0, W, H);
+
+  const p = {
+    qrScale: parseInt(elements.controls.qrSize.value) / 100,
+    textSize: parseInt(elements.controls.textSize.value),
+    textVOffset: parseInt(elements.controls.textVOffset.value),
+    lx: parseInt(elements.controls.leftOffset.value),
+    rx: parseInt(elements.controls.rightOffset.value),
+    ty: parseInt(elements.controls.topOffset.value),
+    by: parseInt(elements.controls.bottomOffset.value),
+    color: elements.controls.colorPicker.value,
+    showText: elements.controls.toggleText.checked,
+    mode: elements.controls.modeSelect.value
+  };
+
+  const qrW = W * p.qrScale;
+  const qrH = qrW;
+  const margin = W * 0.02;
+  const textGap = 50 + p.textVOffset;
+
+  const yTopBase = H * 0.2;
+  const yBottomRowBase = H * 0.65;
+
+  ctx.fillStyle = p.color;
+  ctx.font = `bold ${p.textSize}px "Helvetica Neue", Arial, sans-serif`;
+  ctx.textAlign = 'center';
+  ctx.shadowColor = "rgba(255, 255, 255, 0.8)";
+  ctx.shadowBlur = 4;
+
+  const leftX = margin + 0 + p.lx;
+  
+  const rightX = W - qrW - margin + p.rx;
+
+  const drawQR = (img, txt, x, y) => {
+    if(!img) return;
+    ctx.drawImage(img, x, y, qrW, qrH);
+    if(p.showText) {
+      ctx.strokeStyle = p.color === '#ffffff' ? '#000000' : '#ffffff';
+      ctx.lineWidth = p.textSize / 10;
+      ctx.strokeText(txt, x + qrW/2, y - textGap);
+      ctx.fillText(txt, x + qrW/2, y - textGap);
+    }
+  };
+
+  if (p.mode === '2') {
+    const yPos = yBottomRowBase + p.ty;
+    drawQR(state.images.lt, elements.texts.lt.value, leftX, yPos);
+    drawQR(state.images.rt, elements.texts.rt.value, rightX, yPos);
+  } else {
+    const yTop = yTopBase + p.ty;
+    drawQR(state.images.lt, elements.texts.lt.value, leftX, yTop);
+    drawQR(state.images.rt, elements.texts.rt.value, rightX, yTop);
+
+    const yBottom = yBottomRowBase + p.by;
+    drawQR(state.images.l, elements.texts.l.value, leftX, yBottom);
+    drawQR(state.images.r, elements.texts.r.value, rightX, yBottom);
+  }
+
+  elements.ui.preview.src = elements.ui.canvas.toDataURL('image/png');
+  elements.ui.preview.style.display = 'block';
+  elements.ui.placeholder.style.display = 'none';
+  elements.ui.downloadBtn.style.display = 'block';
+  elements.ui.discordBtn.style.display = 'block';
+}
+
+function downloadImage() {
+  if (!state.images.main) return;
+  const a = document.createElement('a');
+  a.href = elements.ui.canvas.toDataURL('image/png');
+  a.download = `route_share_${new Date().getTime()}.png`;
+  a.click();
+}
+
+async function sendToDiscord() {
+  const url = elements.controls.webhook.value.trim();
+  if(!url) {
+    alert('Discord Webhook URLを入力してください。');
+    return;
+  }
+  if(!state.images.main) return;
+
+  const btn = elements.ui.discordBtn;
+  const originalText = btn.innerText;
+  btn.disabled = true;
+  btn.innerText = "送信中...";
+
+  elements.ui.canvas.toBlob(async (blob) => {
+    const formData = new FormData();
+    formData.append('file', blob, 'route_share.png');
+
+    try {
+      const response = await fetch(url, { method: 'POST', body: formData });
+      if(response.ok) {
+        alert('Discordに送信しました！');
+      } else {
+        alert('送信に失敗しました。URLを確認してください。');
+      }
+    } catch (e) {
+      console.error(e);
+      alert('エラーが発生しました。');
+    } finally {
+      btn.disabled = false;
+      btn.innerText = originalText;
+    }
+  }, 'image/png');
+}
+
+function resetAll() {
+  if(!confirm('設定をすべてリセットしますか？')) return;
+  Object.keys(state.images).forEach(k => state.images[k] = null);
+  Object.values(elements.thumbs).forEach(t => { t.src = ''; t.style.display = 'none'; });
+  Object.values(elements.inputs).forEach(i => i.value = '');
+  elements.texts.lt.value = '先１';
+  elements.texts.rt.value = '後１';
+  elements.texts.l.value = '先２';
+  elements.texts.r.value = '後２';
+  
+  elements.controls.qrSize.value = 15;
+  elements.controls.textSize.value = 45;
+  elements.controls.textVOffset.value = 0;
+  elements.controls.leftOffset.value = 0;
+  elements.controls.rightOffset.value = 0;
+  elements.controls.topOffset.value = 0;
+  elements.controls.bottomOffset.value = 0;
+  elements.controls.modeSelect.value = '2';
+  elements.controls.toggleText.checked = true;
+  elements.controls.colorPicker.value = '#000000';
+
+  updateMode();
+}
+
+init();
+</script>
+</body>
+</html>

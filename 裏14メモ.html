@@ -2,205 +2,290 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@yu_作成</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>裏14メモ - @yu_作成</title>
     <style>
+        :root {
+            --bg-color: #f0f2f5;
+            --card-bg: #ffffff;
+            --text-main: #2d3436;
+            --text-sub: #636e72;
+            --border-radius: 12px;
+            --primary-accent: #d9534f;
+            
+            --color-green: #e6f9ea;
+            --text-green: #218838;
+            --border-green: #28a745;
+            
+            --color-yellow: #fff9db;
+            --text-yellow: #b58900;
+            --border-yellow: #ffc107;
+            
+            --color-red: #ffe3e3;
+            --text-red: #c92a2a;
+            --border-red: #dc3545;
+            
+            --color-blue: #e7f5ff;
+            --text-blue: #1864ab;
+            --border-blue: #007bff;
+        }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
             margin: 0;
-            padding: 20px;
-            background-color: #f4f4f9;
-            color: #333;
-            line-height: 1.6;
+            padding: 16px;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            line-height: 1.5;
         }
-        h1 {
-            color: #d9534f;
-            border-bottom: 3px solid #d9534f;
-            padding-bottom: 8px;
-            margin-bottom: 25px;
-            text-align: center;
-        }
+
         .container {
             max-width: 600px;
-            margin: 0 auto; 
-            background-color: #fff;
-            padding: 25px;
-            border-radius: 10px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            margin: 0 auto;
+            background-color: var(--card-bg);
+            padding: 20px;
+            border-radius: var(--border-radius);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
         }
+
+        h1 {
+            color: var(--primary-accent);
+            font-size: 1.4rem;
+            margin: 0 0 24px 0;
+            text-align: center;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 12px;
+        }
+
         .section-title {
-            font-size: 1.2em;
-            color: #5cb85c;
-            margin-bottom: 15px;
-            border-left: 5px solid #5cb85c;
-            padding-left: 10px;
-        }
-        .memo-item {
-            display: flex;
-            align-items: center;
-            margin-bottom: 15px;
-        }
-        .memo-item label {
-            width: 150px;
+            font-size: 1rem;
             font-weight: bold;
+            color: var(--text-sub);
+            margin: 24px 0 12px;
             display: flex;
             align-items: center;
-            color: #333; 
-            flex-shrink: 0;
         }
-        .memo-item select {
-            padding: 10px;
-            border: 1px solid #ccc;
+        .section-title::before {
+            content: '';
+            display: inline-block;
+            width: 4px;
+            height: 1.2em;
+            background-color: var(--primary-accent);
+            margin-right: 8px;
+            border-radius: 2px;
+        }
+
+        .memo-form {
+            display: grid;
+            gap: 12px;
+        }
+
+        .memo-item {
+            display: grid;
+            grid-template-columns: 80px 1fr;
+            align-items: center;
+            gap: 10px;
+            background: #fff;
+        }
+
+        .memo-item label {
+            font-weight: bold;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            color: var(--text-sub);
+        }
+        
+        .pos-badge {
+            display: inline-block;
+            background: #eee;
+            color: #555;
+            padding: 2px 6px;
             border-radius: 4px;
-            flex-grow: 1;
-            color: #333; 
-            background-color: white; 
-            font-size: 1em;
+            font-size: 0.8rem;
+            margin-right: 4px;
+            font-weight: normal;
         }
+
+        .select-wrapper {
+            position: relative;
+        }
+        .select-wrapper::after {
+            content: '▼';
+            font-size: 0.8rem;
+            color: #aaa;
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            pointer-events: none;
+        }
+
+        select {
+            width: 100%;
+            padding: 12px 16px;
+            font-size: 1rem;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: #fff;
+            appearance: none;
+            color: var(--text-main);
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        select:focus {
+            border-color: var(--primary-accent);
+        }
+        select:disabled {
+            background-color: #f9f9f9;
+            color: #ccc;
+        }
+
         .result-list {
             list-style: none;
             padding: 0;
+            margin: 0;
+            display: grid;
+            gap: 10px;
         }
-        .result-list li {
-            padding: 12px;
-            margin-bottom: 8px;
-            border-radius: 6px;
+
+        .result-item {
+            padding: 12px 16px;
+            border-radius: 8px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            font-size: 1.1em;
-            font-weight: bold;
-            background-color: #e9ecef;
+            background-color: #f8f9fa;
+            border-left: 5px solid #ccc;
+            transition: all 0.3s ease;
         }
-        .result-order {
-            background-color: #6c757d; 
-            color: white;
-            padding: 5px 10px;
-            border-radius: 4px;
-            margin-right: 15px;
-            flex-shrink: 0;
+
+        .result-left {
+            display: flex;
+            flex-direction: column;
         }
-        .monster-name {
-            font-style: italic;
-            color: #d9534f;
-            text-align: right;
-            flex-shrink: 0;
-        }
-        .note {
-            margin-top: 20px;
-            padding: 15px;
-            background-color: #fcf8e3;
-            border: 1px solid #faebcc;
-            color: #8a6d3b;
-            border-radius: 4px;
-            font-size: 0.95em;
-        }
-        .color-display {
-            width: 15px;
-            height: 15px;
-            border-radius: 3px;
-            margin-right: 5px;
-            border: 1px solid #333;
-            background-color: white; 
-            flex-shrink: 0;
-        }
-		
-        .color-green { background-color: #28a745 !important; }
-        .color-yellow { background-color: #ffc107 !important; }
-        .color-red { background-color: #dc3545 !important; }
-        .color-blue { background-color: #007bff !important; }
         
-        @media (max-width: 600px) {
-            body {
-                padding: 10px;
-            }
-            .container {
-                padding: 15px;
-                border-radius: 0;
-                box-shadow: none;
-            }
-            .memo-item label {
-                width: 120px;
-                font-size: 0.9em;
-            }
-            .memo-item select {
-                padding: 8px;
-                font-size: 0.9em;
-            }
-            .result-list li {
-                font-size: 1em;
-            }
-            .result-order {
-                margin-right: 10px;
-                padding: 4px 8px;
-            }
-            .monster-name {
-                font-size: 0.95em;
-            }
+        .order-label {
+            font-size: 0.75rem;
+            color: var(--text-sub);
+            margin-bottom: 2px;
         }
+        
+        .color-name {
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .monster-name {
+            font-weight: bold;
+            font-size: 1rem;
+            color: var(--text-sub);
+        }
+
+        .style-green { background-color: var(--color-green); border-left-color: var(--border-green); }
+        .style-green .color-name { color: var(--text-green); }
+        .style-green .monster-name { color: var(--text-green); }
+
+        .style-yellow { background-color: var(--color-yellow); border-left-color: var(--border-yellow); }
+        .style-yellow .color-name { color: var(--text-yellow); }
+        .style-yellow .monster-name { color: var(--text-yellow); }
+
+        .style-red { background-color: var(--color-red); border-left-color: var(--border-red); }
+        .style-red .color-name { color: var(--text-red); }
+        .style-red .monster-name { color: var(--text-red); }
+
+        .style-blue { background-color: var(--color-blue); border-left-color: var(--border-blue); }
+        .style-blue .color-name { color: var(--text-blue); }
+        .style-blue .monster-name { color: var(--text-blue); }
+
+        .note {
+            margin-top: 24px;
+            padding: 16px;
+            background-color: #fff8e1;
+            border: 1px solid #ffeeba;
+            color: #856404;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+        .note strong {
+            display: block;
+            margin-bottom: 8px;
+            border-bottom: 1px dashed #d3bd78;
+            padding-bottom: 4px;
+        }
+
     </style>
 </head>
 <body>
 
-    <h1>黒い豚ふざけんな</h1>
-
     <div class="container">
-        <div class="section-title"> 色の並び入力 (手前 → 奥の順)</div>
+        <h1>黒い豚ふざけんな</h1>
+
+        <div class="section-title">色の並び (手前 → 奥)</div>
 
         <form id="color-memo-form" class="memo-form">
             <div class="memo-item">
-                <label for="color1"><span class="result-order">1</span> <span class="color-display" id="display1"></span>手前</label>
-                <select id="color1" onchange="handleSelection(this)">
-                    <option value="">-- 選択 --</option>
-                    <option value="緑">緑</option>
-                    <option value="黄">黄</option>
-                    <option value="赤">赤</option>
-                    <option value="青">青</option>
-                </select>
+                <label for="color1"><span class="pos-badge">1</span> 手前</label>
+                <div class="select-wrapper">
+                    <select id="color1" onchange="handleSelection(this)">
+                        <option value="">選択してください</option>
+                        <option value="緑">緑</option>
+                        <option value="黄">黄</option>
+                        <option value="赤">赤</option>
+                        <option value="青">青</option>
+                    </select>
+                </div>
             </div>
             <div class="memo-item">
-                <label for="color2"><span class="result-order">2</span> <span class="color-display" id="display2"></span>2番目</label>
-                <select id="color2" onchange="handleSelection(this)">
-                    <option value="">-- 選択 --</option>
-                    <option value="緑">緑</option>
-                    <option value="黄">黄</option>
-                    <option value="赤">赤</option>
-                    <option value="青">青</option>
-                </select>
+                <label for="color2"><span class="pos-badge">2</span> 2番目</label>
+                <div class="select-wrapper">
+                    <select id="color2" onchange="handleSelection(this)">
+                        <option value="">選択してください</option>
+                        <option value="緑">緑</option>
+                        <option value="黄">黄</option>
+                        <option value="赤">赤</option>
+                        <option value="青">青</option>
+                    </select>
+                </div>
             </div>
             <div class="memo-item">
-                <label for="color3"><span class="result-order">3</span> <span class="color-display" id="display3"></span>3番目</label>
-                <select id="color3" onchange="handleSelection(this)">
-                    <option value="">-- 選択 --</option>
-                    <option value="緑">緑</option>
-                    <option value="黄">黄</option>
-                    <option value="赤">赤</option>
-                    <option value="青">青</option>
-                </select>
+                <label for="color3"><span class="pos-badge">3</span> 3番目</label>
+                <div class="select-wrapper">
+                    <select id="color3" onchange="handleSelection(this)">
+                        <option value="">選択してください</option>
+                        <option value="緑">緑</option>
+                        <option value="黄">黄</option>
+                        <option value="赤">赤</option>
+                        <option value="青">青</option>
+                    </select>
+                </div>
             </div>
             <div class="memo-item">
-                <label for="color4"><span class="result-order">4</span> <span class="color-display" id="display4"></span>奥</label>
-                <select id="color4" onchange="handleSelection(this)">
-                    <option value="">-- 選択 --</option>
-                    <option value="緑">緑</option>
-                    <option value="黄">黄</option>
-                    <option value="赤">赤</option>
-                    <option value="青">青</option>
-                </select>
+                <label for="color4"><span class="pos-badge">4</span> 奥</label>
+                <div class="select-wrapper">
+                    <select id="color4" onchange="handleSelection(this)">
+                        <option value="">選択してください</option>
+                        <option value="緑">緑</option>
+                        <option value="黄">黄</option>
+                        <option value="赤">赤</option>
+                        <option value="青">青</option>
+                    </select>
+                </div>
             </div>
         </form>
 
-        <div class="section-title"> 討伐順と対応モンスター</div>
+        <div class="section-title">討伐順とターゲット</div>
         
         <ul id="result-display" class="result-list">
-            <li>色を入力してください。</li>
         </ul>
 
         <div class="note">
-            **【モンスター対応表】**<br>
-            緑 → グリーンジェリー | 黄 → イエローミスト<br>
-            赤 → レッドオウル | 青 → ブルートロル
+            <strong>【モンスター対応表】</strong>
+            🟢 緑 → グリーンジェリー<br>
+            🟡 黄 → イエローミスト<br>
+            🔴 赤 → レッドオウル<br>
+            🔵 青 → ブルートロル
         </div>
     </div>
 
@@ -212,11 +297,12 @@
             "青": "ブルートロル"
         };
 
-        const colorStyleMap = {
-            "緑": { bg: '#28a745', class: 'color-green' },
-            "黄": { bg: '#ffc107', class: 'color-yellow' },
-            "赤": { bg: '#dc3545', class: 'color-red' },
-            "青": { bg: '#007bff', class: 'color-blue' },
+        // スタイル用クラスのマッピング
+        const colorClassMap = {
+            "緑": "style-green",
+            "黄": "style-yellow",
+            "赤": "style-red",
+            "青": "style-blue",
         };
 
         const selectIds = ['color1', 'color2', 'color3', 'color4'];
@@ -256,44 +342,35 @@
 
             colors.forEach((color, index) => {
                 const order = index + 1;
-                const listItem = document.createElement('li');
-                const displayId = `display${order}`;
-                const colorDisplay = document.getElementById(displayId);
-                
-                if (color && colorStyleMap[color]) {
-                    colorDisplay.className = `color-display ${colorStyleMap[color].class}`;
-                } else {
-                    colorDisplay.className = 'color-display';
-                }
-
+                const li = document.createElement('li');
+                li.className = 'result-item';
                 
                 if (color) {
                     isEmpty = false;
-                    const monster = monsterMap[color] || '不明なモンスター';
-                    const colorCode = colorStyleMap[color].bg || '#6c757d'; 
+                    const monster = monsterMap[color] || '???';
+                    if (colorClassMap[color]) {
+                        li.classList.add(colorClassMap[color]);
+                    }
 
-                    listItem.innerHTML = `
-                        <div style="display:flex; align-items:center;">
-                            <span class="result-order" style="background-color: ${colorCode};">討伐${order}</span>
-                            <span>${color}</span>
+                    li.innerHTML = `
+                        <div class="result-left">
+                            <span class="order-label">討伐順 ${order}</span>
+                            <span class="color-name">${color}</span>
                         </div>
                         <span class="monster-name">${monster}</span>
                     `;
                 } else {
-                    listItem.innerHTML = `
-                        <div style="display:flex; align-items:center;">
-                            <span class="result-order" style="background-color: #6c757d;">討伐${order}</span>
-                            <span>未選択</span>
+                    li.innerHTML = `
+                        <div class="result-left">
+                            <span class="order-label">討伐順 ${order}</span>
+                            <span class="color-name" style="color:#aaa;">---</span>
                         </div>
-                        <span class="monster-name">...</span>
+                        <span class="monster-name" style="color:#ccc;">...</span>
                     `;
                 }
-                resultDisplay.appendChild(listItem);
+                resultDisplay.appendChild(li);
             });
-
-            if (isEmpty) {
-                resultDisplay.innerHTML = '<li>色を入力してください。</li>';
-            }
+            
         }
 
         window.onload = () => {
@@ -302,6 +379,4 @@
         };
     </script>
 </body>
-
 </html>
-

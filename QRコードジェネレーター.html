@@ -3,175 +3,318 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>QRジェネレーター</title>
+  <title>QR コードジェネーター</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <style>
+    :root {
+      --primary: #3b82f6;
+      --primary-dark: #2563eb;
+      --accent: #10b981;
+      --danger: #ef4444;
+      --bg: #f3f4f6;
+      --card-bg: #ffffff;
+      --text: #1f2937;
+      --text-light: #6b7280;
+    }
+
     body {
-      font-family: system-ui, sans-serif;
+      font-family: 'Helvetica Neue', Arial, sans-serif;
       margin: 0;
-      padding: 20px;
-      text-align: center;
-      background: linear-gradient(135deg, #3b82f6, #1e3a8a);
-      color: #fff;
-    }
-    h1 {
-      margin-bottom: 16px;
-      color: #fff; /* ページタイトルは白文字 */
-    }
-    .card {
-      background: #fff;
-      color: #111;
-      border-radius: 16px;
-      padding: 20px;
-      margin: 0 auto 20px;
-      max-width: 420px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-    }
-    .card h2 {
-      font-size: 16px;
-      margin: 16px 0 8px;
-      color: #111;
-      border-left: 4px solid #2563eb;
-      padding-left: 6px;
-    }
-    input, button {
-      margin: 6px;
-      padding: 12px 16px;
-      font-size: 16px;
-      border: none;
-      border-radius: 8px;
-    }
-    input {
-      border: 1px solid #ccc;
-      width: 70%;
-      max-width: 300px;
+      padding: 40px 20px;
+      background: linear-gradient(135deg, #e0f2fe, #f0fdf4);
+      color: var(--text);
+      min-height: 100vh;
       box-sizing: border-box;
     }
-    button {
-      background: #2563eb;
-      color: #fff;
-      cursor: pointer;
-      min-width: 120px;
+
+    h1 {
+      text-align: center;
+      color: var(--primary-dark);
+      margin-bottom: 30px;
+      font-size: 2rem;
+      letter-spacing: 0.05em;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
     }
-    button:hover { background: #1d4ed8; }
-    button:active { background: #1e40af; }
-    .btn-secondary {
-      background: #374151;
-    }
-    .btn-secondary:hover { background: #1f2937; }
-    .btn-copy {
-      background: #10b981;
-      font-size: 14px;
-      padding: 6px 12px;
-    }
-    .btn-copy:hover { background: #059669; }
-    #qrcode-wrapper {
-      margin: 16px auto;
-      background: #fff;
-      border: 1px solid #ccc;
-      border-radius: 10px;
+
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
       display: flex;
-      justify-content: center;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+      border: 1px solid rgba(255,255,255,0.8);
+    }
+
+    h2 {
+      font-size: 1.1rem;
+      color: var(--text);
+      border-left: 5px solid var(--primary);
+      padding-left: 12px;
+      margin: 0 0 16px 0;
+      display: flex;
       align-items: center;
-      width: 260px;   /* 固定 */
-      height: 260px;  /* 高さも固定 → QR中央固定 */
+      justify-content: space-between;
+      flex-wrap: wrap; /* スマホでボタンが落ちるように */
+      gap: 10px;
+    }
+
+    /* Inputs & Buttons */
+    .input-group {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+    }
+
+    input[type="text"], input[type="number"] {
+      flex: 1;
+      padding: 12px;
+      border: 2px solid #e5e7eb;
+      border-radius: 8px;
+      font-size: 16px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    input:focus {
+      border-color: var(--primary);
+    }
+
+    button {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-size: 15px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      white-space: nowrap;
+    }
+
+    .btn-primary { background: var(--primary); color: white; }
+    .btn-primary:hover { background: var(--primary-dark); transform: translateY(-1px); }
+    
+    .btn-outline { background: transparent; border: 2px solid var(--primary); color: var(--primary); padding: 8px 18px; }
+    .btn-outline:hover { background: var(--primary); color: white; }
+
+    .btn-danger { background: var(--danger); color: white; }
+    .btn-danger:hover { background: #dc2626; }
+
+    .btn-group {
+      display: flex;
+      gap: 8px;
+    }
+
+    /* QR Display Area */
+    .qr-container {
+      background: #f8fafc;
+      border-radius: 12px;
+      padding: 30px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      border: 2px dashed #cbd5e1;
+      margin-bottom: 15px;
+    }
+
+    #qrcode {
+      background: white;
+      padding: 10px;
+      border-radius: 4px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
     }
     #qrcode canvas {
       display: block;
-      margin: auto;
     }
-    #currentText {
-      margin-top: 10px;
-      font-size: 14px;
-      color: #111;
-      background: #f9fafb;
-      border: 1px solid #ddd;
-      border-radius: 8px;
-      padding: 8px;
-      word-break: break-word;
-      max-width: 420px;
-      margin-left: auto;
-      margin-right: auto;
-      text-align: left;
+
+    .current-text-display {
+      margin-top: 15px;
       font-family: monospace;
+      color: var(--text-light);
+      background: #fff;
+      padding: 8px 12px;
+      border-radius: 6px;
+      border: 1px solid #e5e7eb;
+      width: 100%;
+      box-sizing: border-box;
+      word-break: break-all;
+      text-align: center;
+      font-size: 0.9rem;
     }
-    .history {
-      margin: 0 auto;
-      max-width: 420px;
-      text-align: left;
+
+    /* Auto Gen Section */
+    .auto-gen-controls {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: #eff6ff;
+      padding: 15px;
+      border-radius: 8px;
     }
-    .history h2 {
-      font-size: 16px;
-      margin: 12px 0;
-      color: #fff;
+    .status-indicator {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: #cbd5e1;
+      transition: background 0.3s;
+    }
+    .status-indicator.active {
+      background: var(--accent);
+      box-shadow: 0 0 8px var(--accent);
+    }
+
+    /* History Accordion */
+    details {
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      overflow: hidden;
+      background: #fff;
+    }
+    summary {
+      background: #f9fafb;
+      padding: 15px;
+      cursor: pointer;
+      font-weight: bold;
+      list-style: none;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    summary::-webkit-details-marker { display: none; }
+    summary::after {
+      content: '+';
+      font-size: 1.2rem;
+      color: var(--text-light);
+    }
+    details[open] summary::after {
+      content: '-';
+    }
+    
+    .history-list {
+      max-height: 300px;
+      overflow-y: auto;
     }
     .history-item {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      background: #fff;
-      border-radius: 8px;
-      padding: 8px 10px;
-      margin-bottom: 6px;
-      font-family: monospace;
+      padding: 12px 15px;
+      border-top: 1px solid #f3f4f6;
       font-size: 14px;
-      cursor: pointer;
+      transition: background 0.2s;
     }
+    .history-item:hover { background: #f9fafb; }
     .history-text {
       flex: 1;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
-      color: #111;
-      margin-right: 8px;
+      margin-right: 15px;
+      cursor: pointer;
+      font-family: monospace;
     }
+    .btn-copy {
+      padding: 4px 10px;
+      font-size: 12px;
+      background: #e5e7eb;
+      color: var(--text);
+    }
+    .btn-copy:hover { background: #d1d5db; }
+
     @media (max-width: 600px) {
-      input, button {
-        width: 100%;
-      }
+      .input-group { flex-direction: column; }
+      .auto-gen-controls { flex-direction: column; align-items: stretch; }
+      button { width: 100%; }
+      .btn-group { flex-direction: column; width: 100%; margin-top: 10px; }
+      h2 { align-items: flex-start; }
     }
   </style>
 </head>
 <body>
-  <h1>QRジェネレーター</h1>
+
+<div class="container">
+  <h1>QRコードジェネレーター</h1>
+
   <div class="card">
-    <h2>入力から生成</h2>
-    <input type="text" id="inputText" placeholder="文字を入力（最大126文字）">
-    <br>
-    <button onclick="generateQR()">入力文字で生成</button>
-    <button onclick="saveQR()" class="btn-secondary">保存</button>
+    <h2>生成オプション</h2>
+    
+    <div class="input-group">
+      <input type="text" id="inputText" placeholder="テキストを入力 (最大126文字)">
+      <button class="btn-primary" onclick="generateQR()">生成</button>
+    </div>
 
-    <h2>ランダム生成</h2>
-    <button onclick="randomQR()">固定ランダム（12文字）</button>
-    <br>
-    <input type="number" id="lengthInput" min="6" max="126" placeholder="文字数(6-126)">
-    <button onclick="randomQRWithLength()">文字数指定ランダム</button>
-    <br>
-    <button onclick="randomQRRandomLen()">完全ランダム</button>
+    <div style="display:flex; gap:10px; margin-top:15px; flex-wrap:wrap;">
+      <button class="btn-outline" style="flex:1" onclick="randomQR()">ランダム (12桁)</button>
+      <button class="btn-outline" style="flex:1" onclick="randomQRRandomLen()">完全ランダム</button>
+    </div>
+
+    <div style="margin-top: 20px;">
+      <h3 style="font-size:0.9rem; color:var(--text-light); margin-bottom:8px;">自動生成モード</h3>
+      <div class="auto-gen-controls">
+        <div class="status-indicator" id="autoStatus"></div>
+        <input type="number" id="autoInterval" value="3" min="1" max="60" style="width: 80px;" placeholder="秒">
+        <span style="font-size:0.9rem;">秒ごとに生成</span>
+        <button id="btnToggleAuto" class="btn-primary" style="margin-left:auto;" onclick="toggleAutoGeneration()">開始</button>
+      </div>
+    </div>
   </div>
 
-  <div id="qrcode-wrapper">
-    <div id="qrcode"></div>
+  <div class="card">
+    <h2>
+      プレビュー
+      <div class="btn-group">
+        <button class="btn-primary" style="padding:6px 12px; font-size:0.9rem;" onclick="saveDirect()">保存</button>
+        <button class="btn-outline" style="padding:6px 12px; font-size:0.9rem;" onclick="saveAs()">名前を付けて保存</button>
+      </div>
+    </h2>
+    <div class="qr-container">
+      <div id="qrcode"></div>
+      <div id="currentText" class="current-text-display">生成されたテキストがここに表示されます</div>
+    </div>
   </div>
-  <div id="currentText">ここに文字が表示されます</div>
 
-  <div class="history">
-    <h2>履歴（最新10件）</h2>
-    <div id="history"></div>
+  <div class="card" style="padding:0; border:none; box-shadow:none;">
+    <details>
+      <summary>履歴を表示 (最新10件)</summary>
+      <div class="history-list" id="history">
+      </div>
+    </details>
   </div>
+</div>
 
 <script>
   const historyList = [];
   let lastText = "";
+  let autoGenTimer = null;
+  const qrSize = 200;
 
   function renderQR(text) {
     lastText = text;
     const holder = document.getElementById("qrcode");
     holder.innerHTML = "";
-    new QRCode(holder, { text, width: 220, height: 220 });
+    
+    new QRCode(holder, {
+      text: text,
+      width: qrSize,
+      height: qrSize,
+      colorDark : "#000000",
+      colorLight : "#ffffff",
+      correctLevel : QRCode.CorrectLevel.H
+    });
 
     const info = document.getElementById("currentText");
-    info.textContent = `文字数 ${text.length}： ${text}`;
+    info.textContent = text;
 
     addToHistory(text);
   }
@@ -196,43 +339,104 @@
     renderQR(text);
   }
 
-  function randomQRWithLength() {
-    const lenInput = document.getElementById("lengthInput").value;
-    const len = parseInt(lenInput, 10);
-    if (isNaN(len) || len < 6 || len > 126) {
-      alert("6〜126の範囲で指定してください。");
-      return;
-    }
-    const text = randomString(len);
-    renderQR(text);
-  }
-
   function randomQRRandomLen() {
     const len = Math.floor(Math.random() * (126 - 6 + 1)) + 6;
     const text = randomString(len);
     renderQR(text);
   }
 
-  function saveQR() {
+  function toggleAutoGeneration() {
+    const btn = document.getElementById("btnToggleAuto");
+    const indicator = document.getElementById("autoStatus");
+    const intervalInput = document.getElementById("autoInterval");
+    
+    if (autoGenTimer) {
+      clearInterval(autoGenTimer);
+      autoGenTimer = null;
+      btn.textContent = "開始";
+      btn.classList.remove("btn-danger");
+      btn.classList.add("btn-primary");
+      indicator.classList.remove("active");
+      intervalInput.disabled = false;
+    } else {
+      const seconds = parseInt(intervalInput.value, 10);
+      if (isNaN(seconds) || seconds < 0.5) {
+        alert("有効な秒数を入力してください");
+        return;
+      }
+      randomQRRandomLen();
+      autoGenTimer = setInterval(() => {
+        randomQRRandomLen();
+      }, seconds * 1000);
+      btn.textContent = "停止";
+      btn.classList.remove("btn-primary");
+      btn.classList.add("btn-danger");
+      indicator.classList.add("active");
+      intervalInput.disabled = true;
+    }
+  }
+
+  function createPaddedCanvas() {
     const qrCanvas = document.querySelector("#qrcode canvas");
-    if (qrCanvas) {
-      const link = document.createElement("a");
-      link.href = qrCanvas.toDataURL("image/png");
-      const label = lastText.replace(/[^a-zA-Z0-9]/g,"_").slice(0,20);
-      link.download = "QR_" + label + ".png";
-      link.click();
+    if (!qrCanvas) return null;
+
+    const padding = 20;
+    const newCanvas = document.createElement("canvas");
+    const ctx = newCanvas.getContext("2d");
+
+    newCanvas.width = qrCanvas.width + (padding * 2);
+    newCanvas.height = qrCanvas.height + (padding * 2);
+
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(0, 0, newCanvas.width, newCanvas.height);
+    ctx.drawImage(qrCanvas, padding, padding);
+
+    return newCanvas;
+  }
+
+  function downloadCanvas(canvas, filename) {
+    const link = document.createElement("a");
+    link.href = canvas.toDataURL("image/png");
+    link.download = filename.endsWith('.png') ? filename : `${filename}.png`;
+    link.click();
+  }
+
+  function saveDirect() {
+    const canvas = createPaddedCanvas();
+    if (!canvas) { alert("QRコードが生成されていません"); return; }
+    
+    const label = lastText.replace(/[^a-zA-Z0-9]/g, "_").slice(0, 15) || "qrcode";
+    downloadCanvas(canvas, `QR_${label}.png`);
+  }
+
+  function saveAs() {
+    const canvas = createPaddedCanvas();
+    if (!canvas) { alert("QRコードが生成されていません"); return; }
+    
+    const defaultName = `QR_${lastText.replace(/[^a-zA-Z0-9]/g, "_").slice(0, 15)}`;
+    const name = prompt("保存するファイル名を入力してください", defaultName);
+    
+    if (name) {
+      downloadCanvas(canvas, name);
     }
   }
 
   function addToHistory(text) {
+    if (historyList.length > 0 && historyList[0].fullText === text) return;
+
     const historyDiv = document.getElementById("history");
     const item = document.createElement("div");
     item.className = "history-item";
+    item.fullText = text;
 
     const textDiv = document.createElement("div");
     textDiv.className = "history-text";
-    textDiv.textContent = text.length > 50 ? text.substring(0,50)+"…" : text;
-    textDiv.onclick = () => generateQR(null, text);
+    textDiv.textContent = text;
+    textDiv.title = "クリックして再生成";
+    textDiv.onclick = () => {
+      if(autoGenTimer) toggleAutoGeneration();
+      generateQR(null, text);
+    };
 
     const copyBtn = document.createElement("button");
     copyBtn.className = "btn-copy";
@@ -240,7 +444,7 @@
     copyBtn.onclick = (e) => {
       e.stopPropagation();
       navigator.clipboard.writeText(text).then(() => {
-        copyBtn.textContent = "✅";
+        copyBtn.textContent = "OK!";
         setTimeout(() => copyBtn.textContent = "コピー", 1500);
       });
     };
@@ -250,6 +454,7 @@
 
     historyDiv.insertBefore(item, historyDiv.firstChild);
     historyList.unshift(item);
+
     if (historyList.length > 10) {
       const old = historyList.pop();
       old.remove();
@@ -258,4 +463,3 @@
 </script>
 </body>
 </html>
-

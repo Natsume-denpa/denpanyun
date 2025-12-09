@@ -2,65 +2,284 @@
 <html lang="ja">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
   <title>4桁パスワード（PIN）ジェネレーター</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Roboto+Mono:wght@500&display=swap" rel="stylesheet">
+
   <style>
     :root {
-      --bg: #ffffff;
-      --card: #f9fafb;
-      --accent: #06b6d4;
-      --muted: #475569;
-      --text: #0f172a;
+      --bg: #f3f4f6;
+      --card-bg: #ffffff;
+      --primary: #4f46e5; /* 落ち着いたインディゴブルー */
+      --primary-hover: #4338ca;
+      --text-main: #1f2937;
+      --text-sub: #6b7280;
+      --border: #e5e7eb;
+      --display-bg: #f9fafb;
+      --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+      --toggle-bg: #e5e7eb;
+      
       color-scheme: light;
     }
+
     :root[data-theme="dark"] {
-      --bg: #0f1724;
-      --card: #0b1220;
-      --accent: #06b6d4;
-      --muted: #94a3b8;
-      --text: #e6eef6;
+      --bg: #111827;
+      --card-bg: #1f2937;
+      --primary: #818cf8; /* ダークモードでも見やすい明るめのインディゴ */
+      --primary-hover: #6366f1;
+      --text-main: #f9fafb;
+      --text-sub: #9ca3af;
+      --border: #374151;
+      --display-bg: #111827;
+      --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+      --toggle-bg: #4b5563;
+      
       color-scheme: dark;
     }
-    *{box-sizing:border-box}
-    body{font-family:Inter,system-ui,-apple-system,"Hiragino Kaku Gothic ProN",Meiryo,sans-serif; margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--bg);color:var(--text);transition:background 0.3s,color 0.3s}
-    .card{background:var(--card);padding:2rem;border-radius:12px;box-shadow:0 8px 30px rgba(2,6,23,0.1);width:100%;max-width:520px;transition:background 0.3s}
-    h1{font-size:1.25rem;margin:0 0 0.5rem}
-    p.lead{margin:0 0 1rem;color:var(--muted)}
-    .pin-display{font-variant-numeric:tabular-nums;font-size:3.25rem;background:rgba(0,0,0,0.05);padding:0.75rem 1rem;border-radius:8px;text-align:center;letter-spacing:0.2rem;margin-bottom:1rem;transition:background 0.3s}
-    .controls{display:flex;gap:0.5rem;flex-wrap:wrap}
-    button{background:var(--accent);border:0;padding:0.6rem 0.9rem;border-radius:8px;color:#042027;font-weight:600;cursor:pointer;transition:background 0.3s,color 0.3s}
-    button.ghost{background:transparent;border:1px solid rgba(0,0,0,0.15);color:var(--muted)}
-    :root[data-theme="dark"] button.ghost{border:1px solid rgba(255,255,255,0.1)}
-    .options{display:flex;gap:1rem;align-items:center;margin-top:1rem}
-    label{display:flex;gap:0.5rem;align-items:center;font-size:0.95rem;color:var(--muted)}
-    input[type=checkbox]{width:18px;height:18px}
-    footer{margin-top:1rem;font-size:0.85rem;color:var(--muted)}
-    .theme-toggle{margin-left:auto}
-    @media(max-width:420px){.pin-display{font-size:2.25rem}}
+
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--bg);
+      color: var(--text-main);
+      padding: 1rem;
+      transition: background 0.3s ease, color 0.3s ease;
+    }
+
+    .card {
+      background: var(--card-bg);
+      padding: 2rem;
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+      width: 100%;
+      max-width: 480px;
+      transition: background 0.3s ease, transform 0.2s ease;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 0.5rem;
+    }
+    
+    h1 {
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin: 0;
+      color: var(--text-main);
+    }
+
+    .theme-toggle {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text-sub);
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 1.2rem;
+      transition: all 0.2s;
+    }
+    .theme-toggle:hover {
+      background: var(--bg);
+      color: var(--text-main);
+    }
+
+    p.lead {
+      margin: 0 0 1.5rem;
+      color: var(--text-sub);
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+
+    .pin-display-wrapper {
+      margin-bottom: 1.5rem;
+    }
+    
+    .pin-display {
+      font-family: 'Roboto Mono', monospace;
+      font-size: 3.5rem;
+      font-weight: 500;
+      background: var(--display-bg);
+      color: var(--primary);
+      padding: 1.5rem 1rem;
+      border-radius: 16px;
+      text-align: center;
+      letter-spacing: 0.5rem;
+      border: 2px solid var(--border);
+      transition: all 0.3s ease;
+      user-select: all;
+    }
+
+    .fade-in {
+      animation: fadeIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.95); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    .controls {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    button {
+      border: none;
+      padding: 1rem;
+      border-radius: 12px;
+      font-weight: 600;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+
+    #generate {
+      background: var(--primary);
+      color: #ffffff;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    }
+    #generate:active { transform: translateY(1px); }
+    #generate:hover { background: var(--primary-hover); }
+
+    #copy {
+      background: transparent;
+      border: 2px solid var(--border);
+      color: var(--text-sub);
+    }
+    #copy:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+      background: rgba(79, 70, 229, 0.05);
+    }
+    #copy.copied {
+      background: #10b981;
+      border-color: #10b981;
+      color: white;
+    }
+
+    .options {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      background: var(--display-bg);
+      padding: 1rem;
+      border-radius: 16px;
+      margin-bottom: 1.5rem;
+    }
+
+    label.option-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      font-size: 0.95rem;
+      color: var(--text-main);
+      padding: 0.25rem 0;
+    }
+
+    input[type=checkbox] {
+      appearance: none;
+      width: 48px;
+      height: 28px;
+      background: var(--toggle-bg);
+      border-radius: 999px;
+      position: relative;
+      cursor: pointer;
+      transition: background 0.3s;
+      outline: none;
+      flex-shrink: 0;
+    }
+    input[type=checkbox]::after {
+      content: '';
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 24px;
+      height: 24px;
+      background: white;
+      border-radius: 50%;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+      transition: transform 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+    }
+    input[type=checkbox]:checked {
+      background: var(--primary);
+    }
+    input[type=checkbox]:checked::after {
+      transform: translateX(20px);
+    }
+
+    footer {
+      font-size: 0.75rem;
+      color: var(--text-sub);
+      text-align: center;
+      border-top: 1px solid var(--border);
+      padding-top: 1rem;
+      line-height: 1.4;
+    }
+
+    @media (max-width: 480px) {
+      .card { padding: 1.5rem; }
+      .pin-display { font-size: 2.75rem; letter-spacing: 0.3rem; }
+      h1 { font-size: 1.1rem; }
+    }
   </style>
 </head>
 <body>
   <main class="card" role="main">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem">
-      <h1>4桁パスワード（PIN）ジェネレーター</h1>
-      <button id="themeToggle" class="ghost theme-toggle" aria-label="テーマ切り替え">🌙</button>
-    </div>
-    <p class="lead">0〜9 の数字を使ってランダムな 4 桁のパスワードを生成します。コピー機能が利用可能です。</p>
+    <header>
+      <h1>パスワード生成</h1>
+      <button id="themeToggle" class="theme-toggle" aria-label="テーマ切り替え">🌙</button>
+    </header>
+    
+    <p class="lead">4桁の数字（PINコード）をランダムに作成します。</p>
 
-    <div id="pin" class="pin-display" aria-live="polite">----</div>
-
-    <div class="controls">
-      <button id="generate">生成する</button>
-      <button id="copy" class="ghost">コピー</button>
+    <div class="pin-display-wrapper">
+      <div id="pin" class="pin-display" aria-live="polite">----</div>
     </div>
 
     <div class="options">
-      <label><input type="checkbox" id="allowRepeat" checked> 同じ数字の繰り返しを許可</label>
-      <label><input type="checkbox" id="noSequential"> 連続した数字を除外（1234, 4567 等）</label>
+      <label class="option-row">
+        <span>同じ数字の繰り返しを許可</span>
+        <input type="checkbox" id="allowRepeat" checked>
+      </label>
+      <label class="option-row">
+        <span>連続した数字を除外<br><small style="font-size:0.75rem; color:var(--text-sub)">(1234, 4567 等)</small></span>
+        <input type="checkbox" id="noSequential">
+      </label>
+    </div>
+
+    <div class="controls">
+      <button id="generate">
+        <span style="font-size:1.2rem">↻</span> 生成する
+      </button>
+      <button id="copy">
+        <span id="copyIcon">📋</span> <span id="copyText">コピー</span>
+      </button>
     </div>
 
     <footer>
-      注意: 突破されても自己責任だよ！
+      ※ 生成された番号は端末内で処理されます。<br>
+      セキュリティに関する保証はありません。<br>自己責任でご利用ください。
     </footer>
   </main>
 
@@ -98,9 +317,18 @@
     const pinEl = document.getElementById('pin');
     const generateBtn = document.getElementById('generate');
     const copyBtn = document.getElementById('copy');
+    const copyText = document.getElementById('copyText');
+    const copyIcon = document.getElementById('copyIcon');
     const themeToggle = document.getElementById('themeToggle');
 
-    function updateDisplay(p){ pinEl.textContent = p; }
+    function updateDisplay(p){ 
+      // アニメーションのリセット
+      pinEl.classList.remove('fade-in');
+      void pinEl.offsetWidth; // リフロー強制
+      pinEl.classList.add('fade-in');
+      
+      pinEl.textContent = p; 
+    }
 
     function getOptions(){
       return {
@@ -113,6 +341,10 @@
       const opts = getOptions();
       const p = generatePin({allowRepeat: opts.allowRepeat, excludeSequential: opts.excludeSequential});
       updateDisplay(p);
+      
+      copyBtn.classList.remove('copied');
+      copyText.textContent = 'コピー';
+      copyIcon.textContent = '📋';
     });
 
     copyBtn.addEventListener('click', async ()=>{
@@ -121,18 +353,37 @@
         alert('先に生成してください。');
         return;
       }
+      
+      const successFeedback = () => {
+        copyBtn.classList.add('copied');
+        copyText.textContent = '完了!';
+        copyIcon.textContent = '✅';
+        
+        setTimeout(()=>{
+          copyBtn.classList.remove('copied');
+          copyText.textContent = 'コピー';
+          copyIcon.textContent = '📋';
+        }, 2000);
+      };
+
       try{
         await navigator.clipboard.writeText(text);
-        copyBtn.textContent = 'コピーしました';
-        setTimeout(()=>copyBtn.textContent='コピー',1500);
+        successFeedback();
       }catch(e){
-        const ta = document.createElement('textarea'); ta.value=text; document.body.appendChild(ta); ta.select();
-        try{ document.execCommand('copy'); alert('コピーしました'); }catch(e){ alert('コピーに失敗しました: ' + e); }
+        const ta = document.createElement('textarea'); 
+        ta.value=text; 
+        document.body.appendChild(ta); 
+        ta.select();
+        try{ 
+          document.execCommand('copy'); 
+          successFeedback();
+        }catch(e){ 
+          alert('コピーに失敗しました'); 
+        }
         ta.remove();
       }
     });
 
-    // テーマ切り替え
     function updateThemeIcon(){
       if(document.documentElement.getAttribute('data-theme') === 'dark'){
         themeToggle.textContent = '☀️';
@@ -153,7 +404,6 @@
       updateThemeIcon();
     });
 
-    // デフォルトはシステム設定に合わせる
     (function(){
       const saved = localStorage.getItem('theme');
       if(saved){

@@ -2,72 +2,92 @@
 <html lang="ja">
 <head>
 <meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>自己紹介カード - 電波人間風デザイン</title>
-<!-- 8bitフォント -->
-<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width,initial-scale=1, maximum-scale=1, user-scalable=no" />
+<title>電波人間 自己紹介カード生成サイト</title>
+
+<link href="https://fonts.googleapis.com/css2?family=DotGothic16&display=swap" rel="stylesheet">
+
 <style>
-  body{
-    margin:0;
+  body {
+    margin: 0;
     font-family: "Noto Sans JP", sans-serif;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    padding:24px;
     background:
       radial-gradient(circle, rgba(255,255,255,0.2) 2px, transparent 3px) repeat,
       #4a64c7;
     background-size: 24px 24px;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 40px 20px;
+    box-sizing: border-box;
+    overflow-y: auto;
+  }
+
+  #scaler {
+    transform-origin: top center;
+    transition: transform 0.2s;
+    margin-bottom: 50px;
   }
 
   .card-wrapper {
-    width:1000px;
-    height:1420px;
-    border-radius:24px;
-    overflow:hidden;
-    background:#cfefff;
+    width: 1000px;
+    height: auto;        
+    max-height: 1420px;  
+    min-height: 800px;   
+    border-radius: 24px;
+    overflow: hidden;
+    background: #cfefff;
     box-shadow: 0 8px 20px rgba(0,0,0,0.25);
-    border:6px solid #004c99;
-    box-sizing:border-box;
-    padding:24px;
+    border: 6px solid #004c99;
+    box-sizing: border-box;
+    padding: 24px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
   }
 
   .header {
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
     margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 4px dashed #a3e4ff;
+    flex-shrink: 0;
   }
+
   .title {
-    font-size:48px;
-    font-weight:900;
-    color:#004c99;
-    text-shadow: 
-      2px 2px 0 #ffffff,
-     -2px 2px 0 #ffffff,
-      2px -2px 0 #ffffff,
-     -2px -2px 0 #ffffff,
-      0 2px 0 #ffffff,
-      2px 0 0 #ffffff,
-      0 -2px 0 #ffffff,
-     -2px 0 0 #ffffff;
+    font-family: "DotGothic16", sans-serif;
+    font-size: 48px;
+    color: #004c99;
+    line-height: 1;
+    text-shadow: 3px 3px 0 #fff;
   }
+
   .logo {
-    font-family: 'Press Start 2P', cursive;
-    font-size:18px;
-    color:#ffcc00;
-    letter-spacing:1px;
+    font-family: "DotGothic16", sans-serif;
+    font-size: 32px;
+    color: #ffcc00;
+    letter-spacing: 1px;
+    margin-bottom: 6px;
     text-shadow: 
-      2px 2px 0 #000,
-     -2px 2px 0 #000,
+      3px 3px 0 #000,
+      -2px -2px 0 #000,  
       2px -2px 0 #000,
-     -2px -2px 0 #000;
+      -2px 2px 0 #000,
+      2px 2px 0 #000;
+    transform: rotate(-3deg);
+    display: inline-block;
   }
 
   .main {
     display: grid;
     grid-template-columns: 1fr 1.3fr;
     gap: 20px;
+    flex: 1;
+    overflow: hidden;
   }
   .left, .right {
     display: flex;
@@ -76,244 +96,415 @@
   }
 
   .label {
-    display:inline-block;
-    padding:6px 10px;
-    background:#4ac6ff;
-    border-radius:10px;
-    font-weight:900;
-    font-size:18px;
-    color:#003344;
-    border:2px solid #0077cc;
-    text-align:center;
-    text-shadow: 
-      1px 1px 0 #ffffff,
-     -1px 1px 0 #ffffff,
-      1px -1px 0 #ffffff,
-     -1px -1px 0 #ffffff;
+    display: inline-block;
+    padding: 6px 10px;
+    background: #4ac6ff;
+    border-radius: 10px;
+    font-family: "DotGothic16", sans-serif;
+    font-size: 20px;
+    color: #003344;
+    border: 2px solid #0077cc;
+    text-align: center;
+    text-shadow: 1px 1px 0 #fff;
   }
 
   .panel {
-    background:#dff7ff;
-    border-radius:10px;
-    padding:10px;
+    background: #dff7ff;
+    border-radius: 10px;
+    padding: 10px;
     border: 2px solid #a3e4ff;
-    font-size:16px;
-    color:#003344;
-    min-height:60px;
+    font-size: 18px;
+    color: #003344;
+    min-height: 60px;
+    outline: none;
+    font-family: "DotGothic16", sans-serif;
+    line-height: 1.5;
+  }
+  .panel:focus {
+    background: #fff;
+    border-color: #0077cc;
+  }
+
+  .panel-split {
+    display: flex;
+    gap: 12px;
+    align-items: stretch;
+  }
+  .sub-avatar {
+    width: 120px;
+    background: #fff;
+    border: 2px dashed #0077cc;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    cursor: pointer;
+    flex-shrink: 0;
+    position: relative;
+    min-height: 120px;
+  }
+  .sub-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: none;
+  }
+  .sub-avatar .placeholder {
+    font-size: 12px;
+    color: #555;
+    text-align: center;
+    font-family: "DotGothic16", sans-serif;
+  }
+  .sub-text {
+    flex: 1;
+    outline: none;
+    min-height: 100px;
   }
 
   .small-panel {
-    min-height:40px;
-    max-width:160px;
+    min-height: 40px;
+    max-width: 160px;
   }
   .name-panel {
-    min-height:60px;
-    font-weight:bold;
-    font-size:32px;
-    overflow:hidden;
-    display:flex;
-    align-items:center;
-    justify-content:center;
+    min-height: 60px;
+    font-weight: bold;
+    font-size: 32px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   .avatar {
-    background:#dff7ff;
-    border-radius:10px;
-    min-height:220px;
-    border:2px dashed #0077cc;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    overflow:hidden;
-    cursor:pointer;
+    background: #dff7ff;
+    border-radius: 10px;
+    min-height: 220px;
+    border: 2px dashed #0077cc;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    cursor: pointer;
+    position: relative;
   }
-  .avatar img{
-    width:100%;
-    height:auto;
-    object-fit:contain;
-    display:block;
+  .avatar img {
+    width: 100%;
+    height: auto;
+    max-height: 750px; 
+    object-fit: contain;
+    display: block;
   }
   .avatar .placeholder {
-    text-align:center;
-    color:#555;
-    font-size:14px;
+    text-align: center;
+    color: #555;
+    font-size: 14px;
+    padding: 10px;
+    font-family: "DotGothic16", sans-serif;
   }
 
   .footer {
-    margin-top: 20px;
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
+    margin-top: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
   }
   .chip {
-    padding:6px 12px;
-    background:#4ac6ff;
-    border-radius:999px;
-    font-weight:700;
-    font-size:14px;
-    color:#003344;
-    border:2px solid #0077cc;
-    text-shadow: 
-      1px 1px 0 #ffffff,
-     -1px 1px 0 #ffffff,
-      1px -1px 0 #ffffff,
-     -1px -1px 0 #ffffff;
+    padding: 6px 12px;
+    background: #4ac6ff;
+    border-radius: 999px;
+    font-weight: 700;
+    font-size: 14px;
+    color: #003344;
+    border: 2px solid #0077cc;
+    font-family: "DotGothic16", sans-serif;
   }
   .btn {
-    padding:10px 16px;
-    border-radius:8px;
-    border:none;
-    cursor:pointer;
-    font-weight:700;
+    padding: 12px 20px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    font-weight: 700;
+    font-size: 16px;
+    margin-left: 8px;
+    font-family: "DotGothic16", sans-serif;
   }
   .btn-save {
-    background:#0ea5d6;
-    color:#fff;
+    background: #0ea5d6;
+    color: #fff;
+    box-shadow: 0 4px 0 #0077cc;
+  }
+  .btn-save:active {
+    box-shadow: 0 2px 0 #0077cc;
+    transform: translateY(2px);
   }
   .btn-reset {
-    background:#fff;
-    border:2px solid #0077cc;
-    color:#003344;
+    background: #fff;
+    border: 2px solid #0077cc;
+    color: #003344;
+  }
+
+  .modal-overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.8);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    padding: 20px;
+    flex-direction: column;
+  }
+  .modal-content {
+    background: #fff;
+    padding: 10px;
+    border-radius: 8px;
+    max-width: 100%;
+    max-height: 80vh;
+    overflow: auto;
+    text-align: center;
+  }
+  .modal-content img {
+    max-width: 100%;
+    height: auto;
+    border: 2px solid #ddd;
+  }
+  .modal-msg {
+    color: #fff;
+    margin-bottom: 10px;
+    font-weight: bold;
+    text-align: center;
+    font-size: 18px;
+    font-family: "DotGothic16", sans-serif;
+  }
+  .close-btn {
+    margin-top: 10px;
+    padding: 10px 24px;
+    background: #ff4444;
+    color: #fff;
+    border: none;
+    border-radius: 99px;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 16px;
+    font-family: "DotGothic16", sans-serif;
   }
 </style>
 </head>
 <body>
-  <div class="card-wrapper" id="card">
-    <div class="header">
-      <div class="title">自己紹介カード</div>
-      <div class="logo">NEW 電波人間 RPG FREE!</div>
-    </div>
 
-    <div class="main">
-      <!-- 左カラム -->
-      <div class="left">
-        <div>
-          <div class="label">アバター</div>
-          <div class="avatar" id="avatarDrop">
-            <img id="avatarImg" src="" alt="" style="display:none;">
-            <div class="placeholder" id="avatarPlaceholder">
-              クリックして画像を選択
+  <div id="scaler">
+    <div class="card-wrapper" id="card">
+      <div class="header">
+        <div class="title">自己紹介カード</div>
+        <div class="logo">NEW 電波人間 RPG FREE!</div>
+      </div>
+
+      <div class="main">
+        <div class="left">
+          <div>
+            <div class="label">アバター</div>
+            <div class="avatar" id="avatarDrop">
+              <img id="avatarImg" src="" alt="" style="display:none;">
+              <div class="placeholder" id="avatarPlaceholder">
+                画像を選択<br>(タップ)
+              </div>
+              <input id="avatarFile" type="file" accept="image/*" style="display:none">
             </div>
-            <input id="avatarFile" type="file" accept="image/*" style="display:none">
+          </div>
+
+          <div>
+            <div class="label">好きな作品</div>
+            <div class="panel" contenteditable="true"></div>
+          </div>
+
+          <div>
+            <div class="label">好きなアンテナ</div>
+            <div class="panel" contenteditable="true"></div>
+          </div>
+
+          <div>
+            <div class="label">好きなモンスター</div>
+            <div class="panel" contenteditable="true"></div>
+          </div>
+
+          <div>
+            <div class="label">プレイスタイル</div>
+            <div class="panel" contenteditable="true"></div>
           </div>
         </div>
 
-        <div>
-          <div class="label">好きな作品</div>
-          <div class="panel" contenteditable="true"></div>
-        </div>
+        <div class="right">
+          <div>
+            <div class="label">おなまえ</div>
+            <div class="panel name-panel" contenteditable="true" id="namePanel">ななし</div>
+          </div>
+          <div>
+            <div class="label">ねんれい</div>
+            <div class="panel small-panel" contenteditable="true"></div>
+          </div>
+          <div>
+            <div class="label">せいべつ</div>
+            <div class="panel small-panel" contenteditable="true"></div>
+          </div>
 
-        <div>
-          <div class="label">好きなアンテナ</div>
-          <div class="panel" contenteditable="true"></div>
-        </div>
+          <div>
+            <div class="label">好きな電波人間（写真も貼れるよ！）</div>
+            <div class="panel panel-split" style="min-height:120px;">
+              <div class="sub-avatar" id="favDenpaDrop">
+                <img id="favDenpaImg" src="" alt="">
+                <div class="placeholder" id="favDenpaPlaceholder">＋写真</div>
+                <input id="favDenpaFile" type="file" accept="image/*" style="display:none">
+              </div>
+              <div class="sub-text" contenteditable="true">
+                電波人間の名前や理由を書いてください。<br>レア度や好きな技などもどうぞ！
+              </div>
+            </div>
+          </div>
 
-        <div>
-          <div class="label">好きなモンスター</div>
-          <div class="panel" contenteditable="true"></div>
-        </div>
+          <div>
+            <div class="label">ひとこと</div>
+            <div class="panel" contenteditable="true" style="min-height:100px;">
+              一言メッセージや挨拶をどうぞ！仲良くしてね。
+            </div>
+          </div>
 
-        <div>
-          <div class="label">プレイスタイル</div>
-          <div class="panel" contenteditable="true"></div>
+          <div>
+            <div class="label">自由記入（追加メモ）</div>
+            <div class="panel" contenteditable="true" style="min-height:100px;">
+              あればSNS、仲間募集、希望プレイ時間など。
+            </div>
+          </div>
         </div>
       </div>
 
-      <!-- 右カラム -->
-      <div class="right">
+      <div class="footer" id="footer">
+        <div class="chip">@yu_ プロフ作成ツール</div>
         <div>
-          <div class="label">おなまえ</div>
-          <div class="panel name-panel" contenteditable="true" id="namePanel">ななし</div>
+          <button id="downloadBtn" class="btn btn-save">画像を保存</button>
+          <button id="resetBtn" class="btn btn-reset">リセット</button>
         </div>
-        <div>
-          <div class="label">ねんれい</div>
-          <div class="panel small-panel" contenteditable="true"></div>
-        </div>
-        <div>
-          <div class="label">せいべつ</div>
-          <div class="panel small-panel" contenteditable="true"></div>
-        </div>
-
-        <div>
-          <div class="label">好きな電波人間（できれば写真付きで！）</div>
-          <div class="panel" contenteditable="true" style="min-height:120px;">
-            電波人間の名前や理由を書いてください。レア度や好きな技などもどうぞ！
-          </div>
-        </div>
-
-        <div>
-          <div class="label">ひとこと</div>
-          <div class="panel" contenteditable="true" style="min-height:100px;">
-            一言メッセージや挨拶をどうぞ！仲良くしてね。
-          </div>
-        </div>
-
-        <div>
-          <div class="label">自由記入（追加メモ）</div>
-          <div class="panel" contenteditable="true" style="min-height:100px;">
-            あればSNS、仲間募集、希望プレイ時間など。
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="footer" id="footer">
-      <div class="chip">@yu_ プロフ作成ツール</div>
-      <div>
-        <button id="downloadBtn" class="btn btn-save">画像として保存</button>
-        <button id="resetBtn" class="btn btn-reset">初期化</button>
       </div>
     </div>
   </div>
 
+  <div class="modal-overlay" id="resultModal">
+    <div class="modal-msg">画像を長押しして保存してください</div>
+    <div class="modal-content">
+      <img id="resultImg" src="" alt="生成されたカード">
+    </div>
+    <button class="close-btn" onclick="document.getElementById('resultModal').style.display='none'">閉じる</button>
+  </div>
+
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 <script>
-  // Reset
+  function fitCardToScreen() {
+    const cardWrapper = document.getElementById('card');
+    const cardWidth = 1000;
+    const screenWidth = window.innerWidth;
+    const margin = 40;
+    
+    const currentHeight = cardWrapper.offsetHeight;
+
+    if (screenWidth < cardWidth + margin) {
+      const scale = (screenWidth - margin) / cardWidth;
+      const scaler = document.getElementById('scaler');
+      scaler.style.transform = `scale(${scale})`;
+      
+      document.body.style.height = (currentHeight * scale + 100) + 'px'; 
+    } else {
+      document.getElementById('scaler').style.transform = 'scale(1)';
+      document.body.style.height = 'auto';
+    }
+  }
+
+  window.addEventListener('resize', fitCardToScreen);
+  window.addEventListener('load', fitCardToScreen);
+  const resizeObserver = new ResizeObserver(() => fitCardToScreen());
+  resizeObserver.observe(document.getElementById('card'));
+
+
   document.getElementById('resetBtn').addEventListener('click', ()=>{
-    if(!confirm('カードを初期状態に戻しますか？')) return;
+    if(!confirm('カードを初期状態に戻しますか？\n（入力した内容は消えます）')) return;
     location.reload();
   });
 
-  // 保存（背景を枠色に固定し、box-shadowとアバター枠を一時的にオフ）
   document.getElementById('downloadBtn').addEventListener('click', ()=>{
     const card = document.getElementById('card');
     const footer = document.getElementById('footer');
+    
     const avatar = document.getElementById('avatarDrop');
-
+    const avatarImg = document.getElementById('avatarImg');
+    const avatarPlaceholder = document.getElementById('avatarPlaceholder');
+    
+    const favDenpa = document.getElementById('favDenpaDrop');
+    const favDenpaImg = document.getElementById('favDenpaImg');
+    
     const oldShadow = card.style.boxShadow;
-    const oldBorder = avatar.style.border;
-
+    const oldAvatarBorder = avatar.style.border;
+    const oldFavBorder = favDenpa.style.border;
+    
     card.style.boxShadow = "none";
-    avatar.style.border = "none";
     footer.style.display = 'none';
 
-    html2canvas(card, {
-      backgroundColor: "#004c99", // ★ 枠色で四隅を塗る
-      scale: 1,
-      width: 1000,
-      height: 1420
-    }).then(canvas => {
-      card.style.boxShadow = oldShadow;
-      avatar.style.border = oldBorder || "2px dashed #0077cc";
-      footer.style.display = 'flex';
+    avatar.style.border = "none";
+    if(avatarImg.style.display === 'none'){
+        avatarPlaceholder.style.display = 'none';
+    }
 
-      const a = document.createElement('a');
-      a.download = 'self_card.png';
-      a.href = canvas.toDataURL('image/png');
-      a.click();
+    const isFavImageSet = (favDenpaImg.style.display === 'block');
+    if(isFavImageSet){
+        favDenpa.style.border = "none";
+    } else {
+        favDenpa.style.display = 'none';
+    }
+
+    window.scrollTo(0, 0);
+
+    html2canvas(card, {
+      backgroundColor: "#004c99", 
+      scale: 1.5,
+      width: 1000,
+      useCORS: true
+    }).then(canvas => {
+      
+      card.style.boxShadow = oldShadow;
+      footer.style.display = 'flex';
+      
+      avatar.style.border = oldAvatarBorder || "2px dashed #0077cc";
+      if(avatarImg.style.display === 'none'){
+          avatarPlaceholder.style.display = 'block';
+      }
+
+      if(isFavImageSet){
+          favDenpa.style.border = oldFavBorder || "2px dashed #0077cc";
+      } else {
+          favDenpa.style.display = 'flex';
+      }
+
+      const imgData = canvas.toDataURL('image/png');
+      const modal = document.getElementById('resultModal');
+      const resultImg = document.getElementById('resultImg');
+      
+      resultImg.src = imgData;
+      modal.style.display = 'flex';
+
+    }).catch(err => {
+      alert("画像の生成に失敗しました。\n" + err);
+      card.style.boxShadow = oldShadow;
+      footer.style.display = 'flex';
+      avatar.style.border = oldAvatarBorder;
+      favDenpa.style.display = 'flex';
     });
   });
 
-  // アバター画像アップロード
   const avatarDrop = document.getElementById('avatarDrop');
   const avatarFile = document.getElementById('avatarFile');
   const avatarImg = document.getElementById('avatarImg');
   const avatarPlaceholder = document.getElementById('avatarPlaceholder');
 
-  avatarDrop.addEventListener('click', () => {
-    avatarFile.click();
-  });
-
+  avatarDrop.addEventListener('click', () => avatarFile.click());
   avatarFile.addEventListener('change', (e) => {
     const file = e.target.files[0];
     if(file){
@@ -322,25 +513,46 @@
         avatarImg.src = event.target.result;
         avatarImg.style.display = 'block';
         avatarPlaceholder.style.display = 'none';
-        avatarDrop.style.minHeight = "auto";
+        avatarDrop.style.border = "none";
+        setTimeout(fitCardToScreen, 100);
       };
       reader.readAsDataURL(file);
     }
   });
 
-  // おなまえ欄の文字サイズ自動調整
+  const favDenpaDrop = document.getElementById('favDenpaDrop');
+  const favDenpaFile = document.getElementById('favDenpaFile');
+  const favDenpaImg = document.getElementById('favDenpaImg');
+  const favDenpaPlaceholder = document.getElementById('favDenpaPlaceholder');
+
+  favDenpaDrop.addEventListener('click', () => favDenpaFile.click());
+  favDenpaFile.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if(file){
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        favDenpaImg.src = event.target.result;
+        favDenpaImg.style.display = 'block';
+        favDenpaPlaceholder.style.display = 'none';
+        favDenpaDrop.style.border = "none";
+        setTimeout(fitCardToScreen, 100);
+      };
+      reader.readAsDataURL(file);
+    }
+  });
+
   const namePanel = document.getElementById('namePanel');
   function adjustFontSize() {
     let fontSize = 48;
     namePanel.style.fontSize = fontSize + "px";
-    while (namePanel.scrollHeight > namePanel.clientHeight || namePanel.scrollWidth > namePanel.clientWidth) {
+    while ( (namePanel.scrollHeight > namePanel.clientHeight || namePanel.scrollWidth > namePanel.clientWidth) && fontSize > 10 ) {
       fontSize--;
       namePanel.style.fontSize = fontSize + "px";
-      if (fontSize < 12) break;
     }
   }
   namePanel.addEventListener('input', adjustFontSize);
-  window.addEventListener('load', adjustFontSize);
+  setTimeout(adjustFontSize, 500);
+
 </script>
 </body>
 </html>

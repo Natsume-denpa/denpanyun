@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>@yu_作成ツール</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<style>
+  body {
+    font-family: 'Noto Sans JP', 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+    padding: 20px;
+    margin: 0;
+    background: #e9ecef;
+    color: #343a40;
+  }
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  h2 {
+    text-align: center;
+    margin-bottom: 35px;
+    font-size: 2.8em;
+    font-weight: 700;
+    color: #007bff;
+    border-bottom: 3px solid #007bff;
+    display: inline-block;
+    padding-bottom: 5px;
+  }
+  .header-container {
+    text-align: center;
+  }
+  .search-container {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 40px;
+  }
+  #searchInput {
+    width: 90%;
+    max-width: 600px;
+    padding: 14px 45px 14px 25px;
+    font-size: 18px;
+    border: 2px solid #ced4da;
+    border-radius: 30px;
+    box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+    outline: none;
+    box-sizing: border-box;
+  }
+  #searchInput:focus {
+    border-color: #28a745;
+    box-shadow: 0 0 0 4px rgba(40, 167, 69, 0.25);
+  }
+  .search-icon {
+    position: relative;
+    left: -40px;
+    top: 1px;
+    color: #6c757d;
+    pointer-events: none;
+    font-size: 24px;
+    align-self: center;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 25px;
+  }
+  .card {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 20px;
+    text-align: center;
+    box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border-left: 5px solid #007bff;
+  }
+  .card:hover {
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: 0 12px 25px rgba(0,0,0,0.2);
+    border-left: 5px solid #28a745;
+  }
+  .card img {
+    width: 100%;
+    height: auto;
+    max-height: 120px;
+    object-fit: contain;
+    margin-bottom: 10px;
+  }
+  .card h3 {
+    font-size: 1.5em;
+    margin: 0 0 10px 0;
+    color: #2c3e50;
+    font-weight: 700;
+  }
+  .card p {
+    margin: 3px 0;
+    font-size: 0.95em;
+    color: #495057;
+    line-height: 1.5;
+    text-align: left;
+  }
+  .card p strong {
+    display: block; /* タイトルをブロック要素にして改行 */
+    font-size: 1em; /* タイトルは少し大きめに */
+    margin-bottom: 2px;
+    color: #007bff;
+    font-weight: 600;
+  }
+  .card p span {
+    font-size: 0.9em; /* 内容は少し小さめに */
+    color: #6c757d;
+  }
+  .effect {
+    font-weight: bold;
+    color: #dc3545;
+    padding: 5px 0;
+    border-top: 1px dashed #ced4da;
+    margin-top: 10px;
+  }
+  .group {
+    font-weight: bold;
+    color: #28a745;
+    padding-bottom: 5px;
+  }
+  .group-icon {
+    font-size: 1.2em;
+    margin-right: 5px;
+  }
+  .hide {
+    display: none !important;
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <div class="header-container">
+    <h2>New 電波人間 頭の形 図鑑</h2>
+  </div>
+  <div class="search-container">
+    <input type="text" id="searchInput" placeholder="名前、作り方、補正、グループで検索..." onkeyup="searchCards()">
+    <span class="material-icons search-icon">search</span>
+  </div>
+
+  <div class="grid" id="cardContainer">
+    <div class="card">
+      <img src="https://raw.githubusercontent.com/Natsume-denpa/denpamen-/main/head.png/00_%E3%81%BE%E3%82%8B_0x8000004d.png" alt="まる">
+      <h3>まる</h3>
+      <p><strong>作り方</strong><span>なし</span></p>
+      <p class="effect"><strong>補正</strong><span>なし</span></p>
+      <p class="group"><strong>グループ</strong><span class="group-icon">-</span><span>なし</span></p>
+    </div>
+    
+    <div class="card">
+      <img src="https://raw.githubusercontent.com/Natsume-denpa/denpamen-/main/head.png/01_%E3%82%88%E3%81%93%E3%81%BE%E3%82%8B_0x80000017.png" alt="よこまる">
+      <h3>よこまる</h3>
+      <p><strong>作り方</strong><span>なし</span></p>
+      <p class="effect"><strong>補正</strong><span>なし</span></p>
+      <p class="group"><strong>グループ</strong><span class="group-icon">-</span><span>なし</span></p>
+    </div>
+    
+    <div class="card">
+      <img src="https://raw.githubusercontent.com/Natsume-denpa/denpamen-/main/head.png/02_%E3%81%9F%E3%81%A6%E3%81%BE%E3%82%8B_0x80000036.png" alt="たてまる">
+      <h3>たてまる</h3>
+      <p><strong>作り方</strong><span>なし</span></p>
+      <p class="effect"><strong>補正</strong><span>なし</span></p>
+      <p class="group"><strong>グループ</strong><span class="group-icon">-</span><span>なし</span></p>
+    </div>
+    
+    <div class="card">
+      <img src="https://raw.githubusercontent.com/Natsume-denpa/denpamen-/main/head.png/03_%E3%81%95%E3%82%93%E3%81%8B%E3%81%8F_0x80000002.png" alt="さんかく">
+      <h3>さんかく</h3>
+      <p><strong>作り方</strong><span>なし</span></p>
+      <p class="effect"><strong>補正</strong><span>なし</span></p>
+      <p class="group"><strong>グループ</strong><span class="group-icon">-</span><span>なし</span></p>
+    </div>
+    
+    <div class="card">
+      <img src="https://raw.githubusercontent.com/Natsume-denpa/denpamen-/main/head.png/04_%E3%81%8A%E3%81%AB%E3%81%8E%E3%82%8A_0x80000007.png" alt="おにぎり">
+      <h3>おにぎり</h3>
+      <p><strong>作り方</strong><span>さんかく×まる</span></p>
+      <p class="effect"><strong>補正</strong><span>なし</span></p>
+      <p class="group"><strong>グループ</strong><span class="group-icon">-</span><span>なし</span></p>
+    </div>
+    
+    <div class="card">
+      <img src="https://raw.githubusercontent.com/Natsume-denpa/denpamen-/main/head.png/05_%E3%81%97%E3%81%8B%E3%81%8F_0x80000048.png" alt="しかく">
+      <h3>しかく</h3>
+      <p><strong>作り方</strong><span>なし</span></p>
+      <p class="effect"><strong>補正</strong><span>なし</span></p>
+      <p class="group"><strong>グループ</strong><span class="group-icon">-</span><span>なし</span></p>
+    </div>
+    
+    <div class="card">
+      <img src="https://raw.githubusercontent.com/Natsume-denpa/denpamen-/main/head.png/06_%E3%81%8B%E3%81%A9%E3%81%BE%E3%82%8B_0x8000001f.png" alt="かどまる">
+      <h3>かどまる</h3>
+      <p><strong>作り方</strong><span>まる×しかく</span></p>
+      <p class="effect"><strong>補正</strong><span>なし</span></p>
+      <p class="group"><strong>グループ</strong><span class="group-icon">-</span><span>なし</span></p>
+    </div>
+    
+    <div class="card">
+      <img src="https://raw.githubusercontent.com/Natsume-denpa/denpamen-/main/head.png/07_%E3%81%97%E3%81%9A%E3%81%8F_0x80000047.png" alt="しずく">
+      <h3>しずく</h3>
+      <p><strong>作り方</strong><span>まる×まる<br>たまご×たまご</span></p>
+      <p class="effect"><strong>補正</strong><span>なし</span></p>
+      <p class="group"><strong>グループ</strong><span class="group-icon">-</span><span>なし</span></p>
+    </div>
+    
+    <div class="card">
+      <img src="https://raw.githubusercontent.com/Natsume-denpa/denpamen-/main/head.png/08_%E3%81%A4%E3%81%BC_0x8000003d.png" alt="つぼ">
+      <h3>つぼ</h3>
+      <p><strong>作り方</strong><span>しずく×しずく<br>たまねぎ×たまねぎ</span></p>
+      <p class="effect"><strong>補正</strong><span>なし</span></p>
+      <p class="group"><strong>グループ</strong><span class="group-icon">✋</span><span>パー</span></p>
+    </div>
+    
+    <div class="card">
+      <img src="https://raw.githubusercontent.com/Natsume-denpa/denpamen-/main/head.png/09_%E3%81%93%E3%81%90%E3%81%BE_0x80000009.png" alt="こぐま">
+      <h3>こぐま</h3>
+      <p><strong>作り方</strong><span>まる×まる</span></p>
+      <p class="effect"><strong>補正</strong><span>なし</span></p>
+      <p class="group"><strong>グループ</strong><span class="group-icon">-</span><span>なし</span></p>
+    </div>
+    
+    <div class="card">
+      <img src="https://raw.githubusercontent.com/Natsume-denpa/denpamen-/main/head.png/10_%E3%81%82%E3%81%BE%E3%81%A4%E3%82%86_0x8000000c.png" alt="あまつゆ">
+      <h3>あまつゆ</h3>
+      <p><strong>作り方</strong><span>まる×まる</span></p>
+      <p class="effect"><strong>補正</strong><span>なし</span></p>
+      <p class="group"><strong>グループ</strong><span class="group-icon">-</span><span>なし</span></p>
+    </div>
+    
+    <div class="card">
+      <img src="https://raw.githubusercontent.com/Natsume-denpa/denpamen-/main/head.png/11_%E3%83%81%E3%83%A5%E3%83%BC%E3%83%AA%E3%83%83%E3%83%97_0x8000000b.png" alt="チューリップ">
+      <h3>チューリップ</h3>
+      <p><strong>作り方</strong><span>つぼ×スポーティ<br>たまねぎ×スポーティ<br>メラメラ×スポーティ<br>メラメラ×メラメラ</span></p>
+      <p class="effect"><strong>補正</strong><span>ぼうぎょりょく＋50</span></p>
+      <p class="group"><strong>グループ</strong><span class="group-icon">✊</span><span>グー</span></p>
+    </div>
+    
+    <div class="card">
+      <img src="https://raw.githubusercontent.com/Natsume-denpa/denpamen-/main/head.png/12_%E3%83%AD%E3%83%9C_0x80000042.png" alt="ロボ">
+      <h3>ロボ</h3>
+      <p><strong>作り方</strong><span>よこまる×よこまる<br>かどまる×かどまる</span></p>
+      <p class="effect"><strong>補正</strong><span>なし</span></p>
+      <p class="group"><strong>グループ</strong><span class="group-icon">-</span><span>なし</span></p>
+    </div>
+    
+    <div class="card">
+      <img src="https://raw.githubusercontent.com/Natsume-denpa/denpamen-/main/head.png/13_%E3%82%A4%E3%82%AB_0x80000018.png" alt="イカ">
+      <h3>イカ</h3>
+      <p><strong>作り方</strong><span>とんがり×とんがり</span></p>
+      <p class="effect"><strong>補正</strong><span>こうげきりょく +10</span></p>
+      <p class="group"><strong>グループ</strong><span class="group-icon">-</span><span>なし</span></p>
+    </div>
+    
+    <div class="card">
+      <img src="https://raw.githubusercontent.com/Natsume-denpa/denpamen-/main/head.png/14_%E3%83%AD%E3%82%B1%E3%83%83%E3%83%88_0x80000020.png" alt="ロケット">
+      <h3>ロケット</h3>
+      <p><strong>作り方</strong><span>たてまる×たてまる</span></p>
+      <p class="effect"><strong>補正</strong><span>なし</span></p>
+      <p class="group"><strong>グループ</strong><span class="group-icon">✋</span><span>パー</span></p>
+    </div>
+    
+    <div class="card">
+      <img src="https://raw.githubusercontent.com/Natsume-denpa/denpamen-/main/head.png/15_%E3%82%B9%E3%82%BF%E3%83%BC_0x8000003a.png" alt="スター">
+      <h3>スター</h3>
+      <p><strong>作り方</strong><span>ダイヤ×キャッスル<br>ダイヤ×みかづき<br>ダイヤ×ダイヤ<br>かえる×かえる</span></p>
+      <p class="effect"><strong>補正</strong><span>こうげきりょく +70<br>かいひりつ +15<br>ぼうぎょりょく +50</span></p>
+      <p class="group"><strong>グループ</strong><span class="group-icon">✋</span><span>パー</span></p>
+    </div>
+    
+    <div class="card">
+      <img src="https://raw.githubusercontent.com/Natsume-denpa/denpamen-/main/head.png/16_%E3%81%8F%E3%81%BE_0x80000003.png" alt="くま">
+      <h3>くま</h3>
+      <p><strong>作り方</strong><span>こぐま×こぐま<br>いぬみみ×いぬみみ</span></p>
+      <p class="effect"><strong>補正</strong><span>マヒたいせい +1</span></p>
+      <p class="group"><strong>グループ</strong><span class="group-icon">✋</span><span>パー</span></p>
+    </div>
+    
+    <div class="card">
+      <img src="https://raw.githubusercontent.com/Natsume-denpa/denpamen-/main/head.png/17_%E3%83%8F%E3%83%BC%E3%83%88_0x80000005.png" alt="ハート">
+      <h3>ハート</h3>
+      <p><strong>作り方</strong><span>チューリップ×チューリップ<br>おだんご×おだんご<br>うさみみ×うさみみ<br>うさみみ×いぬみみ<br>クワガタ×クワガタ</span></p>
+      <p class="effect"><strong>補正</strong><span>ぼうぎょりょく +100<br>ゆうわく +20％<br>AP +1</span></p>
+      <p class="group"><strong>グループ</strong><span class="group-icon">✋</span><span>パー</span></p>
+    </div>
+    
+    <div class="card">
+      <img src="https://raw.githubusercontent.com/Natsume-denpa/denpamen-/main/head.png/18_%E3%81%AD%E3%81%93%E3%81%BF%E3%81%BF_0x80000045.png" alt="ねこみみ">
+      <h3>ねこみみ</h3>
+      <p><strong>作り方</strong><span>こぐま×こぐま</span></p>
+      <p class="effect"><strong>補正</strong><span>こうげきりょく +10</span></p>
+      <p class="group"><strong>グループ</strong><span class="group-icon">✌️</span><span>チョキ</span></p>
+    </div>
+    
+    <div class="card">
+      <img src="https://raw.githubusercontent.com/Natsume-denpa/denpamen-/main/head.png/19_%E3%83%87%E3%83%93%E3%83%AB_0x80000004.png" alt="デビル">
+      <h3>デビル</h3>
+      <p><strong>作り方</strong><span>でんち×トゲトゲ<br>トゲトゲ×トゲトゲ<br>ロボ×ロボ<br>おかっぱ×クワガタ</span></p>
+      <p class="effect"><strong>補正</strong><span>こうげきりょく +50<br>どくたいせい +3<br>きょうふたいせい +3</span></p>
+      <p class="group"><strong>グループ</strong><span class="group-icon">✌️</span><span>チョキ</span></p>
+    </div>
+    
+    <div class="card">
+      <img src="https://raw.githubusercontent.com/Natsume-denpa/denpamen-/main/head.png/20_%E3%81%BF%E3%81%8B%E3%81%A5%E3%81%8D_0x80000038.png" alt="みかづき">
+      <h3>みかづき</h3>
+      <p><strong>作り方</strong><span>まめ×まめ<br>まめ×ルビー<br>まめ×デビル<br>まめ×クワガタ<br>あまつゆ×イカ<br>ヒレ×ヒレ</span></p>
+      <p class="effect"><strong>補正</strong><span>さいだいHP +100<br>こうげきりょく +50<br>ぞくせいたいせい +1</span></p>
+      <p class="group"><strong>グループ</strong><span class="group-icon">✌️</span><span>チョキ</span></p>
+    </div>
+    
+    <div class="card">
+      <img src="https://raw.githubusercontent.com/Natsume-denpa/denpamen-/main/head.png/21_%E3%81%A8%E3%82%93%E3%81%8C%E3%82%8A_0x80000008.png" alt="とんがり">
+      <h3>とんがり</h3>
+      <p><strong>作り方</strong><span>たまご×たまご</span></p>
+      <p class="effect"><strong>補正</strong><span>なし</span></p>
+      <p class="group"><strong>グループ</strong><span class="group-icon">-</span><span>なし</span></p>
+    </div>
+    
+    <div class="card">
+      <img src="https://raw.githubusercontent.com/Natsume-denpa/denpamen-/main/head.png/22_%E3%81%A7%E3%82%93%E3%81%A1_0x80000034.png" alt="でんち">
+      <h3>でんち</h3>
+      <p><strong>作り方</strong><span>よこまる×よこまる<br>かどまる×かどまる</span></p>
+      <p class="effect"><strong>補正</strong><span>なし</span></p>
+      <p class="group"><strong>グループ</strong><span class="group-icon">-</span><span>なし</span></p>
+    </div>
+    
+    <div class="card">
+      <img src="https://raw.githubusercontent.com/Natsume-denpa/denpamen-/main/head.png/23_%E3%83%88%E3%82%B2%E3%83%88%E3%82%B2_0x80000021.png" alt="トゲトゲ">
+      <h3>トゲトゲ</h3>
+      <p><strong>作り方</strong><span>よこまる×よこまる<br>かどまる×かどまる</span></p>
+      <p class="effect"><strong>補正</strong><span>こうげきりょく +15</span></p>
+      <p class="group"><strong>グループ</strong><span class="group-icon">✌️</span><span>チョキ</span></p>
+    </div>
+    
+    <div class="card">
+      <img src="https://raw.githubusercontent.com/Natsume-denpa/denpamen-/main/head.png/24_%E3%81%9F%E3%81%BE%E3%81%94_0x8000000a.png" alt="たまご">
+      <h3>たまご</h3>
+      <p><strong>作り方</strong><span>なし</span></p>
+      <p class="effect"><strong>補正</strong><span>なし</span></p>
+      <p class="group"><strong>グループ</strong><span class="group-icon">-</span><span>なし</span></p>
+    </div>
+    
+    <div class="card">
+      <img src="https://raw.githubusercontent.com/Natsume-denpa/denpamen-/main/head.png/25_%E3%82%BF%E3%83%AF%E3%83%BC_0x8000003e.png" alt="タワー">
+      <h3>タワー</h3>
+      <p><strong>作り方</strong><span>たてまる×たてまる</span></p>
+      <p class="effect"><strong>補正</strong><span>ゆうわくたいせい +1</span></p>
+      <p class="group"><strong>グループ</strong><span class="group-icon">✊</span><span>グー</span></p>
+    </div>
+    
+    <div class="card">
+      <img src="https://raw.githubusercontent.com/Natsume-denpa/denpamen-/main/head.png/26_%E3%81%84%E3%81%AC%E3%81%BF%E3%81%BF_0x8000001e.png" alt="いぬみみ">
+      <h3>いぬみみ</h3>
+      <p><strong>作り方</strong><span>おにぎり×おにぎり</span></p>
+      <p class="effect"><strong>補正</strong><span>どくたいせい +1</span></p>
+      <p class="group"><strong>グループ</strong><span class="group-icon">✋</span><span>パー</span></p>
+    </div>
+    
+    <div class="card">
+      <img src="https://raw.githubusercontent.com/Natsume-denpa/denpamen-/main/head.png/27_%E3%83%A1%E3%83%A9%E3%83%A1%E3%83%A9_0x80000033.png" alt="メラメラ">
+      <h3>メラメラ</h3>
+      <p><strong>作り方</strong><span>スライム×スライム<br>あまつゆ×あまつゆ<br>たまねぎ×たまねぎ</span></p>
+      <p class="effect"><strong>補正</strong><span>こうげきりょく +5</span></p>
+      <p class="group"><strong>グループ</strong><span class="group-icon">✌️</span><span>チョキ</span></p>
+    </div>
+    
+    <div class="card">
+      <img src="https://raw.githubusercontent.com/Natsume-denpa/denpamen-/main/head.png/28_%E3%82%AF%E3%83%AF%E3%82%AC%E3%82%BF_0x80000022.png" alt="クワガタ">
+      <h3>クワガタ</h3>
+      <p><strong>作り方</strong><span>ひつじ×ひつじ<br>いぬみみ×いぬみみ<br>ピエロ×ピエロ<br>ねこみみ×ねこみみ</span></p>
+      <p class="effect"><strong>補正</strong><span>こうげきりょく +50</span></p>
+      <p class="group"><strong>グループ</strong><span class="group-icon">✌️</span><span>チョキ</span></p>
+    </div>
+    
+    <div class="card">
+      <img src="https://raw.githubusercontent.com/Natsume-denpa/denpamen-/main/head.png/29_%E3%83%80%E3%82%A4%E3%83%A4_0x80000014.png" alt="ダイヤ">
+      <h3>ダイヤ</h3>
+      <p><strong>作り方</strong><span>さんかく×さんかく<br>ルビー×ルビー</span></p>
+      <p class="effect"><strong>補正</strong><span>こうげきりょく +10</span></p>
+      <p class="group"><strong>グループ</strong><span class="group-icon">✌️</span><span>チョキ</span></p>
+    </div>
+    
+    <div class="card">
+      <img src="https://raw.githubusercontent.com/Natsume-denpa/denpamen-/main/head.png/30_%E3%83%AB%E3%83%93%E3%83%BC_0x8000002c.png" alt="ルビー">
+      <h3>ルビー</h3>
+      <p><strong>作り方</strong><span>さんかく×さんかく<br>ダイヤ×ダイヤ</span></p>
+      <p class="effect"><strong>補正</strong><span>こうげきりょく +5</span></p>
+      <p class="group"><strong>グループ</strong><span class="group-icon">-</span><span>なし</span></p>
+    </div>
+    
+    <div class="card">
+      <img src="https://raw.githubusercontent.com/Natsume-denpa/denpamen-/main/head.png/31_%E3%81%9F%E3%81%84%E3%82%88%E3%81%86_0x8000000d.png" alt="たいよう">
+      <h3>たいよう</h3>
+      <p><strong>作り方</strong><span>スター×スター<br>おんがくか×おんがくか</span></p>
+      <p class="effect"><strong>補正</strong><span>こうげきりょく +50<br>ぼうぎょりょく +100<br>いじょうたいせい +3</span></p>
+      <p class="group"><strong>グループ</strong><span class="group-icon">✋</span><span>パー</span></p>
+    </div>
+    
+    <div class="card">
+      <img src="https://raw.githubusercontent.com/Natsume-denpa/denpamen-/main/head.png/32_%E3%81%86%E3%81%95%E3%81%BF%E3%81%BF_0x8000000e.png" alt="うさみみ">
+      <h3>うさみみ</h3>
+      <p><strong>作り方</strong><span>いぬみみ×いぬみみ<br>ピエロ×ピエロ<br>ねこみみ×ねこみみ<br>ひつじ×ひつじ<br>くま×くま</span></p>
+      <p class="effect"><strong>補正</strong><span>ゆうわく +10％<br>すばやさ +20</span></p>
+      <p class="group"><strong>グループ</strong><span class="group-icon">✌️</span><span>チョキ</span></p>
+    </div>
+    
+    <div class="card">
+      <img src="https://raw.githubusercontent.com/Natsume-denpa/denpamen-/main/head.png/33_%E3%81%BE%E3%81%8D%E3%81%8C%E3%81%84_0x8000004c.png" alt="まきがい">
+      <h3>まきがい</h3>
+      <p><strong>作り方</strong><span>たてまる×たてまる<br>ロケット×ロケット</span></p>
+      <p class="effect"><strong>補正</strong><span>なし</span></p>
+      <p class="group"><strong>グループ</strong><span class="group-icon">✋</span><span>パー</span></p>
+    </div>
+    
+    <div class="card">
+      <img src="https://raw.githubusercontent.com/Natsume-denpa/denpamen-/main/head.png/34_%E3%82%AD%E3%83%A3%E3%83%83%E3%82%B9%E3%83%AB_0x8000002d.png" alt="キャッスル">
+      <h3>キャッスル</h3>
+      <p><strong>作り方</strong><span>ぼこ×でこ<br>ブロック×ブロック<br>コック×コック</span></p>
+      <p class="effect"><strong>補正</strong><span>ゴールド +3％<br>ぼうぎょりょく +50</span></p>
+      <p class="group"><strong>グループ</strong><span class="group-icon">✊</span><span>グー</span></p>
+    </div>
+    
+    <div class="card">
+      <img src="https://raw.githubusercontent.com/Natsume-denpa/denpamen-/main/head.png/35_%E3%83%96%E3%83%AD%E3%83%83%E3%82%AF_0x80000011.png" alt="ブロック">
+      <h3>ブロック</h3>
+      <p><strong>作り方</strong><span>しかく×しかく</span></p>
+      <p class="effect"><strong>補正</strong><span>ゆうわくたいせい +1</span></p>
+      <p class="group"><strong>グループ</strong><span class="group-icon">✊</span><span>グー</span></p>
+    </div>
+    
+    <div class="card">
+      <img src="https://raw.githubusercontent.com/Natsume-denpa/denpamen-/main/head.png/36_%E3%81%9F%E3%81%BE%E3%81%AD%E3%81%8E_0x8000004f.png" alt="たまねぎ">
+      <h3>たまねぎ</h3>
+      <p><strong>作り方</strong><span>まる×まる</span></p>
+      <p class="effect"><strong>補正</strong><span>なし</span></p>
+      <p class="group"><strong>グループ</strong><span class="group-icon">-</span><span>なし</span></p>
+    </div>
+    
+    <div class="card">
+      <img src="https://raw.githubusercontent.com/Natsume-denpa/denpamen-/main/head.png/37_%E3%82%8F%E3%81%A3%E3%81%8B_0x80000027.png" alt="わっか">
+      <h3>わっか</h3>
+      <p><strong>作り方</strong><span>スター×みかづき<br>ハート×ハート</span></p>
+      <p class="effect"><strong>補正</strong><span>ぼうぎょりょく +100<br>AP +2<br>ゆうわくたいせい +3</span></p>
+      <p class="group"><strong>グループ</strong><span class="group-icon">✋</span><span>パー</span></p>
+    </div>
+    
+    <div class="card">
+      <img src="https://raw.githubusercontent.com/Natsume-denpa/denpamen-/main/head.png/38_%E3%82%B3%E3%83%83%E3%82%AF_0x80000023.png" alt="コック">
+      <h3>コック</h3>
+      <p><strong>作り方</strong><span>まきがい×まきがい<br>まきがい×タワー<br>ぼこ×ぼこ<br>たてまる×つぼ<br>りゅうせい×スポーティ<br>しょくパン×しょくパン</span></p>
+      <p class="effect"><strong>補正</strong><span>すばやさ初期値 +10<br>ぼうぎょりょく +50</span></p>
+      <p class="group"><strong>グループ</strong><span class="group-icon">✋</span><span>パー</span></p>
+    </div>
+    
+    <div class="card">
+      <img src="https://raw.githubusercontent.com/Natsume-denpa/denpamen-/main/head.png/39_%E3%81%8A%E3%81%95%E3%81%8B%E3%81%AA_0x80000024.png" alt="おさかな">
+      <h3>おさかな</h3>
+      <p><strong>作り方</strong><span>キャンディ×ハート<br>かえる×しょくパン</span></p>
+      <p class="effect"><strong>補正</strong><span>ゆうわくたいせい +2<br>かいひ +15</span></p>
+      <p class="group"><strong>グループ</strong><span class="group-icon">✊</span><span>グー</span></p>
+    </div>
+    
+    <div class="card">
+      <img src="https://raw.githubusercontent.com/Natsume-denpa/denpamen-/main/head.png/40_%E3%82%B9%E3%83%9D%E3%83%BC%E3%83%86%E3%82%A3_0x80000001.png" alt="スポーティ">
+      <h3>スポーティ</h3>
+      <p><strong>作り方</strong><span>スライム×スライム<br>たまねぎ×たまねぎ</span></p>
+      <p class="effect"><strong>補正</strong><span>こうげきりょく +10</span></p>
+      <p class="group"><strong>グループ</strong><span class="group-icon">-</span><span>なし</span></p>
+    </div>
+    
+    <div class="card">
+      <img src="https://raw.githubusercontent.com/Natsume-denpa/denpamen-/main/head.png/41_%E3%82%AD%E3%83%A3%E3%83%B3%E3%83%87%E3%82%A3_0x80000049.png" alt="キャンディ">
+      <h3>キャンディ</h3>
+      <p><strong>作り方</strong><span>よこまる×よこまる</span></p>
+      <p class="effect"><strong>補正</strong><span>かいひりつ +5</span></p>
+      <p class="group"><strong>グループ</strong><span class="group-icon">-</span><span>なし</span></p>
+    </div>
+    
+    <div class="card">
+      <img src="https://raw.githubusercontent.com/Natsume-denpa/denpamen-/main/head.png/42_%E3%81%A7%E3%81%93_0x80000006.png" alt="でこ">
+      <h3>でこ</h3>
+      <p><strong>作り方</strong><span>しかく×しかく</span></p>
+      <p class="effect"><strong>補正</strong><span>こうげきりょく +10</span></p>
+      <p class="group"><strong>グループ</strong><span class="group-icon">✊</span><span>グー</span></p>
+    </div>
+    
+    <div class="card">
+      <img src="https://raw.githubusercontent.com/Natsume-denpa/denpamen-/main/head.png/43_%E3%83%94%E3%82%A8%E3%83%AD_0x8000002e.png" alt="ピエロ">
+      <h3>ピエロ</h3>
+      <p><strong>作り方</strong><span>こぐま×こぐま</span></p>
+      <p class="effect"><strong>補正</strong><span>ゆうわくたいせい +1<br>どくたいせい +1</span></p>
+      <p class="group"><strong>グループ</strong><span class="group-icon">-</span><span>なし</span></p>
+    </div>
+    
+    <div class="card">
+      <img src="https://raw.githubusercontent.com/Natsume-denpa/denpamen-/main/head.png/44_%E3%81%8A%E3%81%A0%E3%82%93%E3%81%94_0x8000002f.png" alt="おだんご">
+      <h3>おだんご</h3>
+      <p><strong>作り方</strong><span>ねこみみ×ねこみみ<br>いぬみみ×いぬみみ<br>ピエロ×ピエロ<br>ひつじ×ひつじ<br>くま×くま</span></p>
+      <p class="effect"><strong>補正</strong><span>いじょうたいせい +1<br>ぞくせいたいせい +1</span></p>
+      <p class="group"><strong>グループ</strong><span class="group-icon">✌️</span><span>チョキ</span></p>
+    </div>
+    
+    <div class="card">
+      <img src="https://raw.githubusercontent.com/Natsume-denpa/denpamen-/main/head.png/45_%E3%81%8A%E3%82%93%E3%81%8C%E3%81%8F%E3%81%8B_0x80000016.png" alt="おんがくか">
+      <h3>おんがくか</h3>
+      <p><strong>作り方</strong><span>でんち×おにぎり</span></p>
+      <p class="effect"><strong>補正</strong><span>ゆうわく +10％</span></p>
+      <p class="group"><strong>グループ</strong><span class="group-icon">✋</span><span>パー</span></p>
+    </div>
+    
+    <div class="card">
+      <img src="https://raw.githubusercontent.com/Natsume-denpa/denpamen-/main/head.png/46_%E3%82%8A%E3%82%85%E3%81%86%E3%81%9B%E3%81%84_0x80000025.png" alt="りゅうせい">
+      <h3>りゅうせい</h3>
+      <p><strong>作り方</strong><span>あまつゆ×あまつゆ<br>たまねぎ×たまねぎ</span></p>
+      <p class="effect"><strong>補正</strong><span>かいひ +5</span></p>
+      <p class="group"><strong>グループ</strong><span class="group-icon">✌️</span><span>チョキ</span></p>
+    </div>
+    
+    <div class="card">
+      <img src="https://raw.githubusercontent.com/Natsume-denpa/denpamen-/main/head.png/47_%E3%81%BE%E3%82%81_0x80000026.png" alt="まめ">
+      <h3>まめ</h3>
+      <p><strong>作り方</strong><span>まる×よこまる</span></p>
+      <p class="effect"><strong>補正</strong><span>ゆうわくたいせい +1</span></p>
+      <p class="group"><strong>グループ</strong><span class="group-icon">-</span><span>なし</span></p>
+    </div>
+    
+    <div class="card">
+      <img src="https://raw.githubusercontent.com/Natsume-denpa/denpamen-/main/head.png/48_%E3%81%BC%E3%81%93_0x80000031.png" alt="ぼこ">
+      <h3>ぼこ</h3>
+      <p><strong>作り方</strong><span>しかく×しかく</span></p>
+      <p class="effect"><strong>補正</strong><span>ぼうぎょりょく +20</span></p>
+      <p class="group"><strong>グループ</strong><span class="group-icon">✊</span><span>グー</span></p>
+    </div>
+    
+    <div class="card">
+      <img src="https://raw.githubusercontent.com/Natsume-denpa/denpamen-/main/head.png/49_%E3%81%B2%E3%81%A4%E3%81%98_0x80000035.png" alt="ひつじ">
+      <h3>ひつじ</h3>
+      <p><strong>作り方</strong><span>こぐま×こぐま</span></p>
+      <p class="effect"><strong>補正</strong><span>ねむりたいせい +1</span></p>
+      <p class="group"><strong>グループ</strong><span class="group-icon">-</span><span>なし</span></p>
+    </div>
+    
+    <div class="card">
+      <img src="https://raw.githubusercontent.com/Natsume-denpa/denpamen-/main/head.png/50_%E3%83%92%E3%83%AC_0x80000040.png" alt="ヒレ">
+      <h3>ヒレ</h3>
+      <p><strong>作り方</strong><span>コック×キャンディ<br>デビル×デビル</span></p>
+      <p class="effect"><strong>補正</strong><span>こうげきりょく +100<br>ぼうぎょりょく +50<br>ぞくせいたいせい +2</span></p>
+      <p class="group"><strong>グループ</strong><span class="group-icon">✌️</span><span>チョキ</span></p>
+    </div>
+    
+    <div class="card">
+      <img src="https://raw.githubusercontent.com/Natsume-denpa/denpamen-/main/head.png/51_%E3%82%B7%E3%83%AB%E3%82%AF%E3%83%8F%E3%83%83%E3%83%88_0x8000000f.png" alt="シルクハット">
+      <h3>シルクハット</h3>
+      <p><strong>作り方</strong><span>おかっぱ×おかっぱ</span></p>
+      <p class="effect"><strong>補正</strong><span>いじょうたいせい +2<br>ぞくせいたいせい +1<br>ジャックたいせい +1</span></p>
+      <p class="group"><strong>グループ</strong><span class="group-icon">✊</span><span>グー</span></p>
+    </div>
+    
+    <div class="card">
+      <img src="https://raw.githubusercontent.com/Natsume-denpa/denpamen-/main/head.png/52_%E3%81%8A%E3%81%8B%E3%81%A3%E3%81%B1_0x8000001b.png" alt="おかっぱ">
+      <h3>おかっぱ</h3>
+      <p><strong>作り方</strong><span>でんち×まめ<br>タワー×タワー</span></p>
+      <p class="effect"><strong>補正</strong><span>ぞくせいたいせい +1<br>ジャックたいせい +1</span></p>
+      <p class="group"><strong>グループ</strong><span class="group-icon">✊</span><span>グー</span></p>
+    </div>
+    
+    <div class="card">
+      <img src="https://raw.githubusercontent.com/Natsume-denpa/denpamen-/main/head.png/53_%E3%81%8B%E3%81%88%E3%82%8B_0x80000041.png" alt="かえる">
+      <h3>かえる</h3>
+      <p><strong>作り方</strong><span>こぐま×くま<br>イカ×くま<br>魚×魚</span></p>
+      <p class="effect"><strong>補正</strong><span>いじょうたいせい +1<br>ジャックたいせい +1</span></p>
+      <p class="group"><strong>グループ</strong><span class="group-icon">✋</span><span>パー</span></p>
+    </div>
+    
+    <div class="card">
+      <img src="https://raw.githubusercontent.com/Natsume-denpa/denpamen-/main/head.png/54_%E3%81%97%E3%82%87%E3%81%8F%E3%83%91%E3%83%B3_0x80000015.png" alt="しょくパン">
+      <h3>しょくパン</h3>
+      <p><strong>作り方</strong><span>キャッスル×キャッスル</span></p>
+      <p class="effect"><strong>補正</strong><span>こうげきりょく +100<br>きょうふたいせい +2<br>きょうふ +10%</span></p>
+      <p class="group"><strong>グループ</strong><span class="group-icon">✊</span><span>グー</span></p>
+    </div>
+    
+    <div class="card">
+      <img src="https://raw.githubusercontent.com/Natsume-denpa/denpamen-/main/head.png/55_%E3%81%A6%E3%82%93%E3%81%97%E3%82%85_0x80000028.png" alt="てんしゅ">
+      <h3>てんしゅ</h3>
+      <p><strong>作り方</strong><span>しょくパン×シルクハット</span></p>
+      <p class="effect"><strong>補正</strong><span>こうげきりょく +100<br>ぼうぎょりょく +100<br>ジャックたいせい +2</span></p>
+      <p class="group"><strong>グループ</strong><span class="group-icon">✊</span><span>グー</span></p>
+    </div>
+    
+    <div class="card">
+      <img src="https://raw.githubusercontent.com/Natsume-denpa/denpamen-/main/head.png/56_%E3%81%AF%E3%81%AD_0x80000010.png" alt="はね">
+      <h3>はね</h3>
+      <p><strong>作り方</strong><span>シルクハット×ヒレ<br>うさみみ×おだんご</span></p>
+      <p class="effect"><strong>補正</strong><span>すばやさ +20<br>かいひ +15<br>ゆうわく +20%</span></p>
+      <p class="group"><strong>グループ</strong><span class="group-icon">✌️</span><span>チョキ</span></p>
+    </div>
+    
+  </div>
+</div>
+
+<script>
+function searchCards() {
+  const input = document.getElementById('searchInput').value.toLowerCase();
+  const cards = document.querySelectorAll('#cardContainer .card');
+  cards.forEach(card => {
+    const text = card.innerText.toLowerCase();
+    
+    card.style.display = 'block'; 
+    if (text.includes(input)) {
+      card.classList.remove('hide');
+    } else {
+      card.classList.add('hide');
+    }
+  });
+}
+</script>
+</body>
+</html>
