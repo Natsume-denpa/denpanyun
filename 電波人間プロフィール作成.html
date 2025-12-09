@@ -3,11 +3,16 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1, maximum-scale=1, user-scalable=no" />
-<title>電波人間 自己紹介カード生成サイト</title>
+<title>電波人間 自己紹介カード生成サイトV2</title>
 
 <link href="https://fonts.googleapis.com/css2?family=DotGothic16&display=swap" rel="stylesheet">
 
 <style>
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+
   body {
     margin: 0;
     font-family: "Noto Sans JP", sans-serif;
@@ -16,28 +21,26 @@
       #4a64c7;
     background-size: 24px 24px;
     min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: flex-start;
-    padding: 40px 20px;
+    padding: 40px 0;
     box-sizing: border-box;
-    overflow-y: auto;
     overflow-x: hidden;
+    
+    display: block; 
+    text-align: center;
   }
 
   #scaler {
+    display: inline-block;
     width: 1000px;
     min-width: 1000px;
     transform-origin: top center;
     transition: transform 0.2s;
     margin-bottom: 50px;
-    flex-shrink: 0;
+    text-align: left;
   }
 
   .card-wrapper {
     width: 1000px;
-    min-width: 1000px;
     height: auto;        
     max-height: 1420px;  
     min-height: 800px;   
@@ -51,7 +54,6 @@
     position: relative;
     display: flex;
     flex-direction: column;
-    flex-shrink: 0;
   }
 
   .header {
@@ -101,6 +103,7 @@
     display: flex;
     flex-direction: column;
     gap: 16px;
+    min-width: 0;
   }
 
   .label {
@@ -413,7 +416,6 @@
     const cardWidth = 1000;
     const screenWidth = window.innerWidth;
     const margin = 40;
-    
     const currentHeight = cardWrapper.offsetHeight;
 
     if (screenWidth < cardWidth + margin) {
@@ -475,6 +477,7 @@
       backgroundColor: "#004c99", 
       scale: 1.5,
       width: 1000,
+      windowWidth: 1000, 
       useCORS: true
     }).then(canvas => {
       
