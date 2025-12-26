@@ -1,230 +1,542 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>静止画メーカー</title>
-    <script src="https://unpkg.com/@ffmpeg/ffmpeg@0.11.6/dist/ffmpeg.min.js"></script>
-    <style>
-        :root { --primary: #0070f3; --error: #ff4d4f; --success: #28a745; }
-        body { font-family: -apple-system, "Segoe UI", Roboto, sans-serif; background: #f8f9fa; color: #333; line-height: 1.6; padding: 20px; }
-        .container { max-width: 700px; margin: 0 auto; background: white; padding: 30px; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
-        h1 { text-align: center; font-size: 1.5rem; margin-bottom: 10px; }
-        
-        .policy-box { background: #f0f7ff; border: 1px solid #cce5ff; padding: 15px; border-radius: 8px; font-size: 0.85rem; margin-bottom: 20px; }
-        .policy-box ul { margin: 5px 0 0; padding-left: 20px; }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Denpanyun Tool Hub | 統合ツールポータル</title>
+  <style>
+    :root {
+      --brand-dark: #0f172a;
+      --brand-primary: #2563eb;
+      --brand-light: #f1f5f9;
+      --text-main: #334155;
+      --text-sub: #64748b;
+      --card-bg: #ffffff;
+      --border-color: #e2e8f0;
+    }
 
-        #drop-zone { border: 2px dashed #ccc; border-radius: 12px; padding: 40px 20px; text-align: center; cursor: pointer; transition: 0.2s; background: #fafafa; }
-        #drop-zone:hover { border-color: var(--primary); background: #f0f7ff; }
-        
-        #status { margin-top: 20px; text-align: center; font-weight: bold; min-height: 24px; }
-        .error-text { color: var(--error); background: #fff1f0; padding: 10px; border-radius: 5px; border: 1px solid var(--error); text-align: left; font-size: 0.9rem; }
-        
-        #preview-area { display: none; margin-top: 30px; text-align: center; border-top: 1px solid #eee; padding-top: 20px; }
-        video { max-width: 100%; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); background: #000; }
-        
-        .btn-group { display: flex; gap: 10px; margin-top: 20px; justify-content: center; flex-wrap: wrap; }
-        .btn { padding: 12px 24px; border-radius: 8px; border: none; cursor: pointer; font-weight: bold; text-decoration: none; font-size: 14px; transition: 0.2s; }
-        .btn-dl { background: var(--success); color: white; }
-        .btn-tw { background: #000; color: white; }
-        .btn:hover { opacity: 0.8; transform: translateY(-1px); }
-        
-        .info { font-size: 0.8rem; color: #666; margin-top: 10px; }
-        
-        #debug-log { margin-top:10px; font-size:0.75rem; color:#999; display:none; text-align:left; max-height:100px; overflow-y:auto; border:1px solid #eee; padding:5px;}
-    </style>
+    body {
+      font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', sans-serif;
+      background-color: var(--brand-light);
+      color: var(--text-main);
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      line-height: 1.6;
+    }
+
+    header {
+      background-color: var(--brand-dark);
+      color: #fff;
+      padding: 0 20px;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+    .header-logo {
+      font-size: 1.2rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .header-logo::before {
+      content: '';
+      display: block;
+      width: 24px;
+      height: 24px;
+      background: var(--brand-primary);
+      border-radius: 4px;
+    }
+    .header-sub {
+      font-size: 0.8rem;
+      color: #94a3b8;
+    }
+
+    .container {
+      flex: 1;
+      width: 100%;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 40px 24px;
+      box-sizing: border-box;
+    }
+
+    .info-panel {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-left: 5px solid var(--brand-primary);
+      border-radius: 6px;
+      padding: 24px;
+      margin-bottom: 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+    .info-content h2 {
+      margin: 0;
+      font-size: 0.9rem;
+      color: var(--text-sub);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    .info-main {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--brand-dark);
+      margin-top: 5px;
+    }
+    .info-date {
+      background: #e0f2fe;
+      color: #0369a1;
+      padding: 4px 12px;
+      border-radius: 4px;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+    @media (max-width: 600px) {
+      .info-panel { flex-direction: column; align-items: flex-start; gap: 10px; }
+    }
+
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 20px;
+    }
+
+    .filter-group {
+      display: flex;
+      gap: 8px;
+    }
+    .filter-btn {
+      background: transparent;
+      border: 1px solid var(--border-color);
+      color: var(--text-sub);
+      padding: 8px 16px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+    .filter-btn:hover {
+      background: #f8fafc;
+      border-color: #cbd5e1;
+      color: var(--brand-dark);
+    }
+    .filter-btn.active {
+      background: var(--brand-dark);
+      border-color: var(--brand-dark);
+      color: #fff;
+    }
+
+    .search-wrapper {
+      position: relative;
+      flex: 1;
+      max-width: 300px;
+    }
+    .search-input {
+      width: 100%;
+      padding: 10px 12px 10px 36px;
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      font-size: 0.95rem;
+      box-sizing: border-box;
+      transition: border-color 0.2s;
+    }
+    .search-input:focus {
+      outline: none;
+      border-color: var(--brand-primary);
+    }
+    .search-icon {
+      position: absolute;
+      left: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-sub);
+      pointer-events: none;
+      font-size: 14px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 24px;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      padding: 24px;
+      text-decoration: none;
+      transition: transform 0.2s, box-shadow 0.2s;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+    .card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+      border-color: #cbd5e1;
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 16px;
+    }
+    .card-icon {
+      width: 48px;
+      height: 48px;
+      background: #f1f5f9;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      color: var(--brand-dark);
+    }
+    .card-badge {
+      font-size: 0.75rem;
+      padding: 4px 8px;
+      border-radius: 4px;
+      background: #f1f5f9;
+      color: var(--text-sub);
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .card h3 {
+      margin: 0 0 8px;
+      font-size: 1.1rem;
+      color: var(--brand-dark);
+      font-weight: 700;
+    }
+    .card p {
+      margin: 0 0 24px;
+      font-size: 0.9rem;
+      color: var(--text-sub);
+      flex: 1;
+      line-height: 1.5;
+    }
+
+    .card-footer {
+      border-top: 1px solid #f1f5f9;
+      padding-top: 16px;
+      display: flex;
+      justify-content: flex-end;
+    }
+    .btn-text {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--brand-primary);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .card:hover .btn-text {
+      text-decoration: underline;
+    }
+
+    .no-results {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 60px;
+      background: #fff;
+      border: 1px dashed var(--border-color);
+      color: var(--text-sub);
+      border-radius: 6px;
+      display: none;
+    }
+
+    footer {
+      background: #fff;
+      border-top: 1px solid var(--border-color);
+      padding: 30px 24px;
+      text-align: center;
+      color: var(--text-sub);
+      font-size: 0.85rem;
+    }
+    .footer-links {
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      margin-bottom: 16px;
+    }
+    .footer-links a {
+      color: var(--text-main);
+      text-decoration: none;
+      font-weight: 500;
+    }
+    .footer-links a:hover {
+      color: var(--brand-primary);
+    }
+  </style>
 </head>
 <body>
 
-<div class="container">
-    <h1>静止画メーカー</h1>
+  <header>
+    <div class="header-logo">DENPANYUN TOOLS</div>
+    <div class="header-sub">電波人間 統合ツールポータル</div>
+  </header>
 
-    <div class="policy-box">
-        <strong>【安心・安全への取り組み】</strong>
-        <ul>
-            <li><strong>プライバシー保護:</strong> 処理はすべてお客様のブラウザ内で行われます。画像や動画がサーバーに送信・保存されることは一切ありません。</li>
-            <li><strong>権利の帰属:</strong> 本ツールで生成された動画の権利は、すべて利用者に帰属します。</li>
-        </ul>
-    </div>
+  <div class="container">
     
-    <div id="drop-zone">
-        <p>画像をドラッグ＆ドロップ<br><span style="font-size: 0.8rem; color: #888;">またはクリックして選択</span></p>
-        <input type="file" id="file-input" accept="image/*" style="display: none;">
+    <div class="info-panel">
+      <div class="info-content">
+        <h2>Daily Quest Status</h2>
+        <div id="questName" class="info-main">Loading...</div>
+      </div>
+      <div id="questDate" class="info-date">--/-- (Loading)</div>
     </div>
 
-    <div id="status"></div>
-    <div id="debug-log"></div>
+    <div class="toolbar">
+      <div class="filter-group">
+        <button class="filter-btn active" data-filter="all">すべて</button>
+        <button class="filter-btn" data-filter="external">外部</button>
+        <button class="filter-btn" data-filter="qr">QR関連</button>
+        <button class="filter-btn" data-filter="image">画像編集</button>
+        <button class="filter-btn" data-filter="other">その他</button>
+      </div>
+      <div class="search-wrapper">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="searchInput" class="search-input" placeholder="キーワード検索...">
+      </div>
+    </div>
 
-    <div id="preview-area">
-        <h3 style="margin-bottom:10px;">生成プレビュー</h3>
-        <video id="output-video" controls loop playsinline></video>
-        <div id="res-display" class="info"></div>
-        <div class="btn-group">
-            <a id="download-link" class="btn btn-dl">動画を保存する</a>
-            <a id="tweet-link" class="btn btn-tw" target="_blank">𝕏(Twitter)でシェア</a>
+    <div class="grid" id="toolGrid">
+	      
+      <a href="https://newdenpafree.ap-gs.com/" target="_blank" class="card" data-category="external">
+        <div class="card-header">
+          <div class="card-icon">公式</div>
+          <span class="card-badge">External</span>
         </div>
-        <button onclick="location.reload()" style="margin-top:20px; background:none; border:none; color:#666; text-decoration:underline; cursor:pointer;">別の画像を変換</button>
+        <h3>電波人間公式</h3>
+        <p>ゲーム公式HP。</p>
+        <div class="card-footer">
+          <span class="btn-text">公式サイトへ移動 ↗</span>
+        </div>
+      </a>
+      
+      <a href="https://colab.research.google.com/drive/112ubM7SlA-f4bZ_yjQbp44_fE6nrch0j?usp=sharing" target="_blank" class="card" data-category="external">
+        <div class="card-header">
+          <div class="card-icon">⚡</div>
+          <span class="card-badge">External</span>
+        </div>
+        <h3>QR徹底管理ツール (Google Colab)</h3>
+        <p>QRコードを生成、管理できるクラウドベースツールです。Google Colab上で動作します。</p>
+        <div class="card-footer">
+          <span class="btn-text">外部サイトへ移動 ↗</span>
+        </div>
+      </a>
+
+      <a href="QRコードジェネレーター.html" class="card" data-category="qr">
+        <div class="card-header">
+          <div class="card-icon">📱</div>
+          <span class="card-badge">QR Tool</span>
+        </div>
+        <h3>QRコードジェネレーター</h3>
+        <p>任意のテキストやランダム文字列から、即座にQRコードを生成・ダウンロード可能です。</p>
+        <div class="card-footer">
+          <span class="btn-text">ツールを開く →</span>
+        </div>
+      </a>
+
+      <a href="ルート画像作成ツール.html" class="card" data-category="image">
+        <div class="card-header">
+          <div class="card-icon">🗺️</div>
+          <span class="card-badge">Image Edit</span>
+        </div>
+        <h3>ルート画像合成</h3>
+        <p>設定した背景画像にQRコードを配置・合成し、Discord等での共有に最適な形式で出力します。</p>
+        <div class="card-footer">
+          <span class="btn-text">ツールを開く →</span>
+        </div>
+      </a>
+
+      <a href="電波人間プロフィール作成.html" class="card" data-category="image">
+        <div class="card-header">
+          <div class="card-icon">✏️</div>
+          <span class="card-badge">Image Edit</span>
+        </div>
+        <h3>プロフ作成ツール</h3>
+        <p>beta版ですが、電波人間のプロフィールを作成できます。</p>
+        <div class="card-footer">
+          <span class="btn-text">ツールを開く →</span>
+        </div>
+      </a>
+
+      <a href="頭図鑑.html" class="card" data-category="other">
+        <div class="card-header">
+          <div class="card-icon">🌟</div>
+          <span class="card-badge">Others</span>
+        </div>
+        <h3>電波人間の頭図鑑</h3>
+        <p>電波人間の頭の形、作り方、効果を図鑑形式で見れます。</p>
+        <div class="card-footer">
+          <span class="btn-text">ツールを開く →</span>
+        </div>
+      </a>
+
+      <a href="頭の出生.html" class="card" data-category="other">
+        <div class="card-header">
+          <div class="card-icon">☀️</div>
+          <span class="card-badge">Others</span>
+        </div>
+        <h3>頭の出生ルート検索</h3>
+        <p>頭の出生ルートを精密に計算し算出</p>
+        <div class="card-footer">
+          <span class="btn-text">ツールを開く →</span>
+        </div>
+      </a>
+
+      <a href="裏14メモ.html" class="card" data-category="other">
+        <div class="card-header">
+          <div class="card-icon">🐷</div>
+          <span class="card-badge">Others</span>
+        </div>
+        <h3>ステージ14 討伐順メモ</h3>
+        <p>トーテムの色をメモし、対応モンスターを討伐順に表示</p>
+        <div class="card-footer">
+          <span class="btn-text">ツールを開く →</span>
+        </div>
+      </a>
+
+      <a href="4桁数字パスワード生成.html" class="card" data-category="other">
+        <div class="card-header">
+          <div class="card-icon">🔒</div>
+          <span class="card-badge">Others</span>
+        </div>
+        <h3>千両箱・宝箱用パスワード生成</h3>
+        <p>人間が考えるパスワードは癖が出るので、安全な4桁のパスワード生成</p>
+        <div class="card-footer">
+          <span class="btn-text">ツールを開く →</span>
+        </div>
+      </a>
+
+      <a href="#" class="card" data-category="other" onclick="alert('準備中です'); return false;">
+        <div class="card-header">
+          <div class="card-icon">📂</div>
+          <span class="card-badge">Others</span>
+        </div>
+        <h3>アーカイブ / 資料集 (準備中)</h3>
+        <p>過去のデータや、その他の関連リソースをまとめたアーカイブページです。</p>
+        <div class="card-footer">
+          <span class="btn-text">詳細を見る →</span>
+        </div>
+      </a>
+
+      <div class="no-results" id="noResults">
+        条件に一致するツールは見つかりませんでした。
+      </div>
+
     </div>
-</div>
+  </div>
+
+  <footer>
+    <div class="footer-links">
+      <a href="https://x.com/yu_" target="_blank">X (Twitter)</a>
+      <a href="https://discord.gg/rBFZK3Qb7X" target="_blank">Discord Community</a>
+      <a href="#">Privacy Policy</a>
+      <a href="#">Contact</a>
+    </div>
+    <div>浜田は炊きました。</div>
+  </footer>
 
 <script>
-    const { createFFmpeg, fetchFile } = FFmpeg;
-    let ffmpeg = null;
+  const quests = [
+    { name: "経験値ゲット", type: "exp" },
+    { name: "ブーストゲット", type: "item" },
+    { name: "ごちそうゲット", type: "food" },
+    { name: "経験値ゲット", type: "exp" },
+    { name: "コインゲット", type: "coin" },
+    { name: "レッツフィッシング", type: "fish" },
+    { name: "ゴールドゲット", type: "gold" }
+  ];
+  const daysJP = ["日", "月", "火", "水", "木", "金", "土"];
 
-    const AI_SIGNATURES = [
-        "chatgpt", "dall-e", "openai", 
-        "google", "gemini", "deepmind", "imagen",
-        "grok", "xai",
-        "midjourney", "nijijourney", 
-        "stable diffusion", "automatic1111", "comfyui", "novelai", "civitai", "sdxl",
-        "adobe firefly", "bing image creator", "microsoft designer",
-        "generated by", "created with"
-    ];
+  function updateQuest() {
+    const now = new Date();
+    let dayIndex = now.getDay();
+    const hour = now.getHours();
 
-    const fileInput = document.getElementById('file-input');
-    const dropZone = document.getElementById('drop-zone');
-    const status = document.getElementById('status');
-    const previewArea = document.getElementById('preview-area');
-    const videoEl = document.getElementById('output-video');
-    const debugLog = document.getElementById('debug-log');
-
-    dropZone.onclick = () => fileInput.click();
-    fileInput.onchange = (e) => handleUpload(e.target.files[0]);
-    dropZone.ondragover = (e) => { e.preventDefault(); dropZone.style.borderColor = "var(--primary)"; };
-    dropZone.ondragleave = () => { dropZone.style.borderColor = "#ccc"; };
-    dropZone.ondrop = (e) => { e.preventDefault(); handleUpload(e.dataTransfer.files[0]); };
-
-    async function handleUpload(file) {
-        if (!file) return;
-        status.innerHTML = "画像データを解析中...";
-        previewArea.style.display = "none";
-        debugLog.style.display = "block";
-        debugLog.innerText = "データ読み込み開始...";
-
-        try {
-            const result = await checkAI(file);
-            
-            if (result.isAI) {
-                status.innerHTML = `
-                    <div class="error-text">
-                        <strong>AI生成画像と判定されました</strong><br>
-                        検出ワード: 「<b>${result.signature}</b>」<br>
-                        <span style="font-size:0.8em; color:#666;">※画像ファイル内のデータに生成AIの名前が含まれています。</span>
-                    </div>`;
-                debugLog.innerText += `\n検出成功: ${result.signature}`;
-                return;
-            } else {
-                debugLog.innerText += `\nAIシグネチャなし。処理を続行します。`;
-            }
-        } catch(e) {
-            console.warn(e);
-            debugLog.innerText += `\n解析エラー(無視して続行): ${e.message}`;
-        }
-
-        try {
-            await generateVideo(file);
-        } catch (e) {
-            console.error(e);
-            status.innerHTML = `<div class="error-text">動画生成エラー: ${e.message}</div>`;
-        }
+    if (hour < 15) {
+      dayIndex = (dayIndex + 6) % 7; 
     }
 
-    async function checkAI(file) {
-        return new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            
-            reader.onload = function(e) {
-                try {
-                    const buffer = e.target.result;
-                    const uint8 = new Uint8Array(buffer);
-                   
-                    const decoder = new TextDecoder('utf-8', {fatal: false});
-                    const textNormal = decoder.decode(uint8).toLowerCase();
+    const currentQuest = quests[dayIndex];
+    const displayDate = hour < 15 
+      ? `${daysJP[dayIndex]}曜分 (～14:59)` 
+      : `${daysJP[dayIndex]}曜分 (15:00～)`;
 
-                    const filteredArr = uint8.filter(b => b !== 0);
-                    const textNoNulls = new TextDecoder('utf-8').decode(filteredArr).toLowerCase();
+    document.getElementById('questName').textContent = currentQuest.name;
+    document.getElementById('questDate').textContent = displayDate;
+  }
+  updateQuest();
+  setInterval(updateQuest, 60000);
 
-                    debugLog.innerText = "スキャン完了。判定中...";
+  const searchInput = document.getElementById('searchInput');
+  const filterBtns = document.querySelectorAll('.filter-btn');
+  const toolGrid = document.getElementById('toolGrid');
+  const cards = toolGrid.querySelectorAll('.card');
+  const noResults = document.getElementById('noResults');
 
-                    for (const sig of AI_SIGNATURES) {
-                        if (textNormal.includes(sig)) {
-                            resolve({ isAI: true, signature: sig });
-                            return;
-                        }
-                        if (textNoNulls.includes(sig)) {
-                            resolve({ isAI: true, signature: sig + " (WideChar)" });
-                            return;
-                        }
-                    }
-                    
-                    resolve({ isAI: false });
-                } catch (err) {
-                    reject(err);
-                }
-            };
-            
-            reader.onerror = reject;
-            reader.readAsArrayBuffer(file);
-        });
-    }
+  let currentCategory = 'all';
+  let currentSearch = '';
 
-    async function generateVideo(file) {
-        status.innerText = "変換エンジン起動中...";
-        
-        if (!ffmpeg) {
-            ffmpeg = createFFmpeg({ 
-                log: true,
-                corePath: 'https://unpkg.com/@ffmpeg/core@0.11.0/dist/ffmpeg-core.js'
-            });
-            await ffmpeg.load();
-        }
+  function filterTools() {
+    let visibleCount = 0;
 
-        const img = new Image();
-        img.src = URL.createObjectURL(file);
-        await img.decode();
-        const w = img.width;
-        const h = img.height;
+    cards.forEach(card => {
+      const category = card.getAttribute('data-category');
+      const title = card.querySelector('h3').textContent.toLowerCase();
+      const desc = card.querySelector('p').textContent.toLowerCase();
+      const text = title + " " + desc;
 
-        status.innerText = `動画生成中（1秒・${w}x${h}）...`;
-        
-        const ext = file.name.split('.').pop();
-        const inputName = `input.${ext}`;
-        
-        ffmpeg.FS('writeFile', inputName, await fetchFile(file));
+      const matchCategory = (currentCategory === 'all') || (category === currentCategory);
+      const matchSearch = text.includes(currentSearch);
 
-        await ffmpeg.run(
-            '-loop', '1',
-            '-i', inputName,
-            '-t', '1',                    
-            '-c:v', 'libx264',
-            '-crf', '18',                 
-            '-pix_fmt', 'yuv420p',
-            '-vf', 'scale=trunc(iw/2)*2:trunc(ih/2)*2', 
-            'output.mp4'
-        );
+      if (matchCategory && matchSearch) {
+        card.style.display = 'flex';
+        visibleCount++;
+      } else {
+        card.style.display = 'none';
+      }
+    });
 
-        const data = ffmpeg.FS('readFile', 'output.mp4');
-        const url = URL.createObjectURL(new Blob([data.buffer], { type: 'video/mp4' }));
+    noResults.style.display = (visibleCount === 0) ? 'block' : 'none';
+  }
 
-        status.innerText = "生成が完了しました！";
-        debugLog.style.display = 'none';
-        videoEl.src = url;
-        document.getElementById('res-display').innerText = `解像度: ${w} x ${h} / 長さ: 1秒`;
-        previewArea.style.display = "block";
-        
-        const dlLink = document.getElementById('download-link');
-        dlLink.href = url;
-        dlLink.download = `video_${Date.now()}.mp4`;
+  filterBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      filterBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      currentCategory = btn.getAttribute('data-filter');
+      filterTools();
+    });
+  });
 
-        const tweetLink = document.getElementById('tweet-link');
-        const tweetText = encodeURIComponent("ご利用ありがとうございました");
-        tweetLink.href = `https://twitter.com/intent/tweet?text=${tweetText}`;
-        
-        try {
-            ffmpeg.FS('unlink', inputName);
-            ffmpeg.FS('unlink', 'output.mp4');
-        } catch(e){}
-    }
+  searchInput.addEventListener('input', (e) => {
+    currentSearch = e.target.value.toLowerCase();
+    filterTools();
+  });
+
 </script>
 
 </body>
